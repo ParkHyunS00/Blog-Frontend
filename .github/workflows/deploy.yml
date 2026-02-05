@@ -1,0 +1,94 @@
+name: Deploy
+
+on:
+  pull_request:
+    types:
+      - closed
+    branches:
+      - main
+  workflow_dispatch:
+
+concurrency:
+  group: frontend-deploy-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-and-push:
+    if: github.event.pull_request.merged == true && (github.base_ref == 'main')
+    runs-on: ubuntu-latest
+  
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Build
+        run: |
+            docker build -t frontend-builder .
+
+            CID=$(docker create frontend-builder)
+
+            docker cp $CID:/app/dist ./dist
+            docker rm $CID
+
+      - name: Upload frontend artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend-dist
+          path: dist
+
+  deploy:
+    name: Deploy Frontend
+    if: github.event.pull_request.merged == true
+    needs: build-and-push
+    runs-on: self-hosted
+
+    steps:
+      - name: Download artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: frontend-dist
+          path: dist
+
+      - name: Deploy to nginx
+        run: |
+          rm -rf /mnt/deploy/blog-web-html/*
+          cp -r dist/* /mnt/deploy/blog-web-html/
+  
+  notify:
+    name: Notify Discord
+    if: ${{ always() }}
+    needs:
+      - build-and-push
+      - deploy
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Notify success
+        if: needs.deploy.result == 'success'
+        uses: tsickert/discord-webhook@v7.0.0
+        with:
+          webhook-url: ${{ secrets.DISCORD_DEPLOY_NOTI_WEBHOOK }}
+          embed-title: "🚀 Blog Frontend 배포 성공 🚀"
+          embed-description: |
+            develop → main PR 병합이 성공적으로 배포되었습니다.
+            > **Commit**: `${{ github.sha }}`
+          embed-color: 3066993
+
+      - name: Notify failure
+        if: needs.build-and-push.result == 'failure' || needs.deploy.result == 'failure'
+        uses: tsickert/discord-webhook@v7.0.0
+        with:
+          webhook-url: ${{ secrets.DISCORD_DEPLOY_NOTI_WEBHOOK }}
+          embed-title: "🚨 Blog Frontend 배포 실패 🚨"
+          embed-description: |
+            블로그 프론트엔드 배포 중 오류가 발생했습니다.
+
+            > **실패 단계**
+            > - build-and-push: `${{ needs.build-and-push.result }}`
+            > - deploy: `${{ needs.deploy.result }}`
+
+            🔍 **실행 로그 확인**
+            👉 [GitHub Actions 로그 보기](
+            ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})
+          embed-color: 15158332
+          embed-author-name: ${{ github.actor }}
