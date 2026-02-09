@@ -86,7 +86,7 @@
 }
 
 .dark {
-  --background: oklch(0.145 0 0);
+  --background: #1c1d1e;
   --foreground: oklch(0.985 0 0);
   --card: oklch(0.205 0 0);
   --card-foreground: oklch(0.985 0 0);
@@ -120,6 +120,9 @@
 }
 
 @layer base {
+  html {
+    overflow-y: scroll;
+  }
   * {
     @apply border-border outline-ring/50;
   }
@@ -127,4 +130,3 @@
     @apply bg-background text-foreground;
   }
 }
-
