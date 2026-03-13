@@ -10,6 +10,7 @@ import {
 } from "@remixicon/react";
 import { cn } from "@/lib/utils";
 import { useThemeStore } from "@/core/stores/use-theme-store";
+import { useCategoryStore } from "@/core/stores/use-category-store";
 
 const NAV_ITEMS = [
   { label: "ABOUT", path: "/about" },
@@ -28,12 +29,6 @@ const ICON_BUTTON_CLASS =
 const SEARCH_ICON_CLASS =
   "absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground";
 
-const Logo = (
-  <Link to="/" className="flex-shrink-0">
-    <img src="/logo.svg" alt="ParkHyunSOO" className="h-7 dark:invert" />
-  </Link>
-);
-
 const AdminLink = (
   <Link to="/admin" className={ICON_BUTTON_CLASS} aria-label="로그인">
     <RiKey2Line size={20} />
@@ -43,8 +38,12 @@ const AdminLink = (
 export function Header(): React.ReactElement {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [searchValue, setSearchValue] = useState("");
-  const theme = useThemeStore((state) => state.theme);
+  const isLightTheme = useThemeStore((state) => state.theme === "light");
   const toggleTheme = useThemeStore((state) => state.toggleTheme);
+
+  function handleLogoClick(): void {
+    useCategoryStore.getState().setSelectedCategory("ALL");
+  }
 
   function handleSearchChange(e: React.ChangeEvent<HTMLInputElement>): void {
     setSearchValue(e.target.value);
@@ -58,7 +57,6 @@ export function Header(): React.ReactElement {
     setIsMobileMenuOpen(false);
   }
 
-  const isLightTheme = theme === "light";
   const themeAriaLabel = isLightTheme ? "다크 모드로 전환" : "라이트 모드로 전환";
   const ThemeIcon = isLightTheme ? RiMoonLine : RiSunLine;
   const themeLabel = isLightTheme ? "다크 모드" : "라이트 모드";
@@ -66,9 +64,11 @@ export function Header(): React.ReactElement {
   const menuAriaLabel = isMobileMenuOpen ? "메뉴 닫기" : "메뉴 열기";
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-border bg-background dark:bg-[#1C1D1E]">
+    <header className="sticky top-0 z-50 w-full border-b border-border bg-background ">
       <div className="mx-auto flex h-14 max-w-screen-xl items-center justify-between px-4">
-        {Logo}
+        <Link to="/" className="flex-shrink-0" onClick={handleLogoClick}>
+          <img src="/logo.svg" alt="ParkHyunSOO" className="h-7 dark:invert" />
+        </Link>
 
         {/* Desktop Navigation */}
         <nav className="hidden md:flex md:items-center md:gap-8">
@@ -120,7 +120,7 @@ export function Header(): React.ReactElement {
       {/* Mobile Menu */}
       <div
         className={cn(
-          "overflow-hidden border-t border-border bg-background transition-all duration-300 md:hidden dark:bg-[#1C1D1E]",
+          "overflow-hidden border-t border-border bg-background transition-all duration-300 md:hidden ",
           isMobileMenuOpen ? "max-h-96" : "max-h-0 border-t-0"
         )}
       >
