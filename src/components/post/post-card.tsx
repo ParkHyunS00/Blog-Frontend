@@ -4,13 +4,14 @@ import type { Post } from "@/features/post/types/post.types";
 
 type PostCardProps = {
   post: Post;
+  isLast?: boolean;
 };
 
-export function PostCard({ post }: PostCardProps): React.ReactElement {
+export function PostCard({ post, isLast = false }: PostCardProps): React.ReactElement {
   return (
     <Link
       to={`/posts/${post.id}`}
-      className="group flex flex-col gap-4 border-b border-border py-10 sm:flex-row sm:gap-6"
+      className={`group flex flex-col gap-4 py-10 sm:flex-row sm:gap-6 ${isLast ? "" : "border-b border-border"}`}
     >
       <img
         src={post.thumbnailUrl}

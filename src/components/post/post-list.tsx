@@ -13,9 +13,9 @@ const CARD_STYLE: React.CSSProperties = {
 export function PostList({ posts }: PostListProps): React.ReactElement {
   return (
     <div className="flex flex-col">
-      {posts.map((post) => (
+      {posts.map((post, index) => (
         <div key={post.id} style={CARD_STYLE}>
-          <PostCard post={post} />
+          <PostCard post={post} isLast={index === posts.length - 1} />
         </div>
       ))}
     </div>
