@@ -141,6 +141,10 @@
   contain-intrinsic-size: 0 200px;
 }
 
+.post-content h1 {
+  @apply mt-16 mb-6 text-3xl font-bold;
+}
+
 .post-content h2 {
   @apply mt-14 mb-6 text-2xl font-bold;
 }
@@ -149,8 +153,25 @@
   @apply mt-8 mb-4 text-lg font-semibold;
 }
 
+.post-content h4 {
+  @apply mt-6 mb-3 text-base font-semibold;
+}
+
+.post-content h5 {
+  @apply mt-4 mb-2 text-sm font-semibold;
+}
+
+.post-content h6 {
+  @apply mt-4 mb-2 text-sm font-medium text-muted-foreground;
+}
+
 .post-content p {
   @apply my-4 leading-relaxed;
+}
+
+.post-content p:empty,
+.post-content p:has(br:only-child) {
+  @apply my-1;
 }
 
 .post-content a {
@@ -168,7 +189,15 @@
 }
 
 .post-content mark {
-  @apply bg-yellow-200/80 px-0.5 dark:bg-yellow-300/30;
+  @apply px-0.5;
+}
+
+.post-content mark:not([style]) {
+  @apply bg-yellow-200/80 dark:bg-yellow-300/30;
+}
+
+.dark .post-content mark[style] {
+  opacity: 0.5;
 }
 
 .post-content blockquote {
@@ -429,12 +458,15 @@
 }
 
 .post-content table {
-  @apply my-6 w-full border-collapse;
+  @apply mx-auto my-6 w-full border-collapse;
+  table-layout: fixed;
 }
 
 .post-content th,
 .post-content td {
-  @apply border border-border px-4 py-2 text-left;
+  @apply border border-border px-3 py-1.5 text-center;
+  word-break: break-word;
+  overflow-wrap: break-word;
 }
 
 .post-content th {
@@ -443,4 +475,116 @@
 
 .post-content hr {
   @apply my-8 border-border;
+}
+
+/* ==============================
+   Post Editor (tiptap) Styles
+   ============================== */
+
+/* Editor placeholder */
+.tiptap p.is-editor-empty:first-child::before {
+  content: attr(data-placeholder);
+  float: left;
+  height: 0;
+  pointer-events: none;
+  @apply text-muted-foreground/50;
+}
+
+/* Editor content area */
+.post-editor-content {
+  min-height: 100%;
+}
+
+.post-editor-content:focus {
+  outline: none;
+}
+
+/* Code block within editor */
+.post-editor-content pre {
+  @apply my-6 overflow-hidden rounded-xl p-4 font-mono text-sm;
+  background: #fafafa;
+}
+
+.dark .post-editor-content pre {
+  background: #2a2b2e;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.post-editor-content pre code {
+  @apply block bg-transparent p-0 text-sm leading-relaxed;
+}
+
+/* Image figure within editor */
+.post-editor-content figure.image-figure {
+  @apply my-6;
+}
+
+.post-editor-content figure.image-figure img {
+  @apply max-w-full rounded-lg;
+}
+
+.post-editor-content figure.image-figure figcaption {
+  @apply mt-2 text-center text-sm text-muted-foreground;
+}
+
+/* Table within editor */
+.post-editor-content .tableWrapper {
+  @apply my-6 overflow-x-auto;
+}
+
+.post-editor-content table {
+  @apply mx-auto w-full border-collapse;
+  table-layout: fixed;
+}
+
+.post-editor-content th,
+.post-editor-content td {
+  @apply relative border border-border px-3 py-1.5 text-center text-sm;
+  word-break: break-word;
+  overflow-wrap: break-word;
+}
+
+.post-editor-content th {
+  @apply bg-muted font-semibold;
+}
+
+.post-editor-content td {
+  @apply align-top;
+}
+
+.post-editor-content th p,
+.post-editor-content td p {
+  @apply my-0;
+}
+
+/* Selected table cells */
+.post-editor-content .selectedCell {
+  @apply bg-[#305CEC]/10 dark:bg-[#5B7FFF]/10;
+}
+
+.post-editor-content .selectedCell::after {
+  content: "";
+  @apply pointer-events-none absolute inset-0 border-2 border-[#305CEC] dark:border-[#5B7FFF];
+}
+
+/* Column resize handle */
+.post-editor-content .column-resize-handle {
+  @apply absolute top-0 right-[-2px] bottom-0 w-1 cursor-col-resize bg-[#305CEC] dark:bg-[#5B7FFF];
+}
+
+/* Callout within editor */
+.post-editor-content [data-type="callout"] {
+  @apply my-6 flex gap-3 rounded-lg bg-muted/60 p-4;
+}
+
+.post-editor-content [data-type="callout"] .callout-emoji {
+  @apply flex-shrink-0 text-xl leading-relaxed;
+}
+
+.post-editor-content [data-type="callout"] .callout-content {
+  @apply min-w-0 flex-1;
+}
+
+.post-editor-content [data-type="callout"] .callout-content p {
+  @apply my-0;
 }
