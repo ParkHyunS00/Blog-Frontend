@@ -3,6 +3,7 @@ import { Header } from "@/components/shared/header";
 import { Footer } from "@/components/shared/footer";
 import { HomePage } from "@/routes/index";
 import { PostDetailPage } from "@/routes/posts/[id]";
+import { PostWritePage } from "@/routes/posts/write";
 
 function App() {
   return (
@@ -11,6 +12,7 @@ function App() {
       <main className="flex-1">
         <Routes>
           <Route path="/" element={<HomePage />} />
+          <Route path="/posts/write" element={<PostWritePage />} />
           <Route path="/posts/:id" element={<PostDetailPage />} />
         </Routes>
       </main>

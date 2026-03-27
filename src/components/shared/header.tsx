@@ -7,10 +7,12 @@ import {
   RiKey2Line,
   RiMenuLine,
   RiCloseLine,
+  RiQuillPenLine,
 } from "@remixicon/react";
 import { cn } from "@/lib/utils";
 import { useThemeStore } from "@/core/stores/use-theme-store";
 import { useCategoryStore } from "@/core/stores/use-category-store";
+import { useAuthStore } from "@/core/stores/use-auth-store";
 
 const NAV_ITEMS = [
   { label: "ABOUT", path: "/about" },
@@ -35,11 +37,18 @@ const AdminLink = (
   </Link>
 );
 
+const WritePostLink = (
+  <Link to="/posts/write" className={ICON_BUTTON_CLASS} aria-label="게시글 작성">
+    <RiQuillPenLine size={20} />
+  </Link>
+);
+
 export function Header(): React.ReactElement {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [searchValue, setSearchValue] = useState("");
   const isLightTheme = useThemeStore((state) => state.theme === "light");
   const toggleTheme = useThemeStore((state) => state.toggleTheme);
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
 
   function handleLogoClick(): void {
     useCategoryStore.getState().setSelectedCategory("ALL");
@@ -104,6 +113,7 @@ export function Header(): React.ReactElement {
           </button>
 
           {AdminLink}
+          {isAuthenticated && WritePostLink}
         </div>
 
         {/* Mobile Menu Button */}
@@ -160,6 +170,16 @@ export function Header(): React.ReactElement {
               <ThemeIcon size={18} />
               {themeLabel}
             </button>
+            {isAuthenticated && (
+              <Link
+                to="/posts/write"
+                onClick={handleMobileMenuClose}
+                className="flex h-10 flex-1 items-center justify-center gap-2 rounded-lg bg-secondary text-sm font-medium text-foreground/80 transition-colors hover:text-foreground"
+              >
+                <RiQuillPenLine size={18} />
+                글쓰기
+              </Link>
+            )}
             <Link
               to="/admin"
               onClick={handleMobileMenuClose}
