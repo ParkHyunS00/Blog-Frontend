@@ -4,6 +4,7 @@ import { Footer } from "@/components/shared/footer";
 import { HomePage } from "@/routes/index";
 import { PostDetailPage } from "@/routes/posts/[id]";
 import { PostWritePage } from "@/routes/posts/write";
+import { AdminPage } from "@/routes/admin/index";
 
 function App() {
   return (
@@ -14,6 +15,7 @@ function App() {
           <Route path="/" element={<HomePage />} />
           <Route path="/posts/write" element={<PostWritePage />} />
           <Route path="/posts/:id" element={<PostDetailPage />} />
+          <Route path="/admin" element={<AdminPage />} />
         </Routes>
       </main>
       <Footer />
