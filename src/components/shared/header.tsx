@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import {
   RiSearchLine,
   RiMoonLine,
@@ -8,11 +8,19 @@ import {
   RiMenuLine,
   RiCloseLine,
   RiQuillPenLine,
+  RiLogoutBoxLine,
 } from "@remixicon/react";
 import { cn } from "@/lib/utils";
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+} from "@/components/ui/dropdown-menu";
 import { useThemeStore } from "@/core/stores/use-theme-store";
 import { useCategoryStore } from "@/core/stores/use-category-store";
-import { useAuthStore } from "@/core/stores/use-auth-store";
+import { useAuthStatus } from "@/features/admin-auth/hooks/queries/use-auth-status";
+import { useLogoutMutation } from "@/features/admin-auth/hooks/mutations/use-logout-mutation";
 
 const NAV_ITEMS = [
   { label: "ABOUT", path: "/about" },
@@ -31,12 +39,6 @@ const ICON_BUTTON_CLASS =
 const SEARCH_ICON_CLASS =
   "absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground";
 
-const AdminLink = (
-  <Link to="/admin" className={ICON_BUTTON_CLASS} aria-label="로그인">
-    <RiKey2Line size={20} />
-  </Link>
-);
-
 const WritePostLink = (
   <Link to="/posts/write" className={ICON_BUTTON_CLASS} aria-label="게시글 작성">
     <RiQuillPenLine size={20} />
@@ -48,10 +50,33 @@ export function Header(): React.ReactElement {
   const [searchValue, setSearchValue] = useState("");
   const isLightTheme = useThemeStore((state) => state.theme === "light");
   const toggleTheme = useThemeStore((state) => state.toggleTheme);
-  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
+  const { data: authStatus } = useAuthStatus();
+  const isAuthenticated = authStatus?.step === "AUTHENTICATED";
+  const navigate = useNavigate();
+  const logoutMutation = useLogoutMutation();
 
   function handleLogoClick(): void {
     useCategoryStore.getState().setSelectedCategory("ALL");
+  }
+
+  function handleLogin(): void {
+    navigate("/admin");
+  }
+
+  function handleLogout(): void {
+    logoutMutation.mutate(undefined, {
+      onSuccess: () => navigate("/", { replace: true }),
+    });
+  }
+
+  function handleMobileLogin(): void {
+    handleLogin();
+    handleMobileMenuClose();
+  }
+
+  function handleMobileLogout(): void {
+    handleLogout();
+    handleMobileMenuClose();
   }
 
   function handleSearchChange(e: React.ChangeEvent<HTMLInputElement>): void {
@@ -112,7 +137,30 @@ export function Header(): React.ReactElement {
             <ThemeIcon size={20} />
           </button>
 
-          {AdminLink}
+          <DropdownMenu modal={false}>
+            <DropdownMenuTrigger asChild>
+              <button
+                type="button"
+                className={ICON_BUTTON_CLASS}
+                aria-label="계정 메뉴"
+              >
+                <RiKey2Line size={20} />
+              </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent>
+              {isAuthenticated ? (
+                <DropdownMenuItem onSelect={handleLogout}>
+                  <RiLogoutBoxLine size={16} />
+                  로그아웃
+                </DropdownMenuItem>
+              ) : (
+                <DropdownMenuItem onSelect={handleLogin}>
+                  <RiKey2Line size={16} />
+                  로그인
+                </DropdownMenuItem>
+              )}
+            </DropdownMenuContent>
+          </DropdownMenu>
           {isAuthenticated && WritePostLink}
         </div>
 
@@ -180,14 +228,25 @@ export function Header(): React.ReactElement {
                 글쓰기
               </Link>
             )}
-            <Link
-              to="/admin"
-              onClick={handleMobileMenuClose}
-              className="flex h-10 flex-1 items-center justify-center gap-2 rounded-lg bg-secondary text-sm font-medium text-foreground/80 transition-colors hover:text-foreground"
-            >
-              <RiKey2Line size={18} />
-              관리자
-            </Link>
+            {isAuthenticated ? (
+              <button
+                type="button"
+                onClick={handleMobileLogout}
+                className="flex h-10 flex-1 items-center justify-center gap-2 rounded-lg bg-secondary text-sm font-medium text-foreground/80 transition-colors hover:text-foreground"
+              >
+                <RiLogoutBoxLine size={18} />
+                로그아웃
+              </button>
+            ) : (
+              <button
+                type="button"
+                onClick={handleMobileLogin}
+                className="flex h-10 flex-1 items-center justify-center gap-2 rounded-lg bg-secondary text-sm font-medium text-foreground/80 transition-colors hover:text-foreground"
+              >
+                <RiKey2Line size={18} />
+                로그인
+              </button>
+            )}
           </div>
         </div>
       </div>
