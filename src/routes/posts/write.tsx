@@ -1,5 +1,5 @@
-import { useState, lazy, Suspense, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useState, lazy, Suspense } from "react";
+import { Navigate } from "react-router-dom";
 import { TitleInput } from "@/components/post-write/title-input";
 import { CategorySelect } from "@/components/post-write/category-select";
 import { TagInput } from "@/components/post-write/tag-input";
@@ -118,15 +118,8 @@ const MOCK_DRAFTS: Draft[] = [
 ];
 
 export function PostWritePage(): React.ReactElement | null {
-  const navigate = useNavigate();
   const { data: authStatus, isLoading: isAuthLoading } = useAuthStatus();
   const isAuthenticated = authStatus?.step === "AUTHENTICATED";
-
-  useEffect(() => {
-    if (!isAuthLoading && !isAuthenticated) {
-      navigate("/", { replace: true });
-    }
-  }, [isAuthLoading, isAuthenticated, navigate]);
 
   const [form, setForm] = useState<PostWriteForm>({
     title: "",
@@ -135,9 +128,8 @@ export function PostWritePage(): React.ReactElement | null {
     content: "",
   });
 
-  if (isAuthLoading || !isAuthenticated) {
-    return null;
-  }
+  if (isAuthLoading) return null;
+  if (!isAuthenticated) return <Navigate to="/" replace />;
 
   function handleTitleChange(title: string): void {
     setForm((prev) => ({ ...prev, title }));

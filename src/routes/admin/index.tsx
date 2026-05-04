@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Navigate } from "react-router-dom";
 import { AdminKeyForm } from "@/components/admin/admin-key-form";
 import { OtpForm } from "@/components/admin/otp-form";
 import { useAdminAuth } from "@/features/admin-auth/hooks/use-admin-auth";
@@ -8,9 +9,8 @@ export function AdminPage(): React.ReactElement | null {
   const [adminKey, setAdminKey] = useState("");
   const [otpCode, setOtpCode] = useState("");
 
-  if (auth.isStatusLoading || auth.step === "AUTHENTICATED") {
-    return null;
-  }
+  if (auth.isStatusLoading) return null;
+  if (auth.step === "AUTHENTICATED") return <Navigate to="/" replace />;
 
   const showOtp = auth.step === "OTP_REQUIRED";
 

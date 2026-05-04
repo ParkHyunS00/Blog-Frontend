@@ -1,6 +1,3 @@
-// src/features/admin-auth/hooks/use-admin-auth.ts
-import { useEffect } from "react";
-import { useNavigate } from "react-router-dom";
 import { ApiException } from "@/core/lib/api-client";
 import type { ApiError } from "@/core/types/api.types";
 import { useCsrf } from "@/features/admin-auth/hooks/queries/use-csrf";
@@ -26,7 +23,7 @@ export interface UseAdminAuthResult {
   step: AuthStep;
   isStatusLoading: boolean;
   submitAdminKey: (adminKey: string) => void;
-  submitOtp: (code: string) => void;
+  submitOtp: (otpCode: string) => void;
   keyError: ApiError | null;
   otpError: ApiError | null;
   isSubmittingKey: boolean;
@@ -34,19 +31,12 @@ export interface UseAdminAuthResult {
 }
 
 export function useAdminAuth(): UseAdminAuthResult {
-  const navigate = useNavigate();
   useCsrf();
   const status = useAuthStatus();
   const keyMutation = useAdminKeyMutation();
   const otpMutation = useOtpMutation();
 
   const step: AuthStep = status.data?.step ?? "ADMIN_KEY_REQUIRED";
-
-  useEffect(() => {
-    if (status.data?.step === "AUTHENTICATED") {
-      navigate("/", { replace: true });
-    }
-  }, [status.data?.step, navigate]);
 
   return {
     step,
