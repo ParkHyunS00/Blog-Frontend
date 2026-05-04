@@ -10,6 +10,8 @@ type OtpFormProps = {
   onChange: (value: string) => void;
   onSubmit: () => void;
   disabled?: boolean;
+  isSubmitting?: boolean;
+  errorMessage?: string | null;
 };
 
 export function OtpForm({
@@ -17,11 +19,15 @@ export function OtpForm({
   onChange,
   onSubmit,
   disabled,
+  isSubmitting,
+  errorMessage,
 }: OtpFormProps): React.ReactElement {
   function handleSubmit(e: React.FormEvent): void {
     e.preventDefault();
     onSubmit();
   }
+
+  const isLocked = disabled || isSubmitting;
 
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-3">
@@ -32,7 +38,7 @@ export function OtpForm({
         maxLength={6}
         value={value}
         onChange={onChange}
-        disabled={disabled}
+        disabled={isLocked}
       >
         <InputOTPGroup className="w-full">
           {Array.from({ length: 6 }, (_, i) => (
@@ -46,11 +52,14 @@ export function OtpForm({
       </InputOTP>
       <Button
         type="submit"
-        disabled={disabled || value.length !== 6}
+        disabled={isLocked || value.length !== 6}
         className="h-11 rounded-lg bg-[#4F6AE8] text-base font-semibold text-white hover:bg-[#3D56D4] dark:bg-[#5B7FFF] dark:hover:bg-[#4A6EEE]"
       >
-        Verify
+        {isSubmitting ? "Verifying…" : "Verify"}
       </Button>
+      {errorMessage ? (
+        <p className="text-center text-sm text-destructive">{errorMessage}</p>
+      ) : null}
     </form>
   );
 }

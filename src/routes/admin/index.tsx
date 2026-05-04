@@ -1,24 +1,18 @@
 import { useState } from "react";
 import { AdminKeyForm } from "@/components/admin/admin-key-form";
 import { OtpForm } from "@/components/admin/otp-form";
+import { useAdminAuth } from "@/features/admin-auth/hooks/use-admin-auth";
 
-type AuthStep = "admin-key" | "otp";
-
-export function AdminPage(): React.ReactElement {
-  const [step, setStep] = useState<AuthStep>("admin-key");
+export function AdminPage(): React.ReactElement | null {
+  const auth = useAdminAuth();
   const [adminKey, setAdminKey] = useState("");
-  const [otpValue, setOtpValue] = useState("");
+  const [otpCode, setOtpCode] = useState("");
 
-  function handleAdminKeyContinue(): void {
-    if (!adminKey.trim()) return;
-    setStep("otp");
+  if (auth.isStatusLoading || auth.step === "AUTHENTICATED") {
+    return null;
   }
 
-  function handleOtpVerify(): void {
-    if (otpValue.length !== 6) return;
-    // TODO: API 연동 - admin key + OTP 검증
-    console.log("verify", { adminKey, otpValue });
-  }
+  const showOtp = auth.step === "OTP_REQUIRED";
 
   return (
     <div className="flex min-h-[calc(100vh-3.5rem)] items-center justify-center px-4">
@@ -26,10 +20,19 @@ export function AdminPage(): React.ReactElement {
         <AdminKeyForm
           value={adminKey}
           onChange={setAdminKey}
-          onSubmit={handleAdminKeyContinue}
-          disabled={step === "otp"}
+          onSubmit={() => auth.submitAdminKey(adminKey)}
+          disabled={showOtp}
+          isSubmitting={auth.isSubmittingKey}
+          errorMessage={auth.keyError?.message ?? null}
         />
-        <OtpForm value={otpValue} onChange={setOtpValue} onSubmit={handleOtpVerify} disabled={step === "admin-key"} />
+        <OtpForm
+          value={otpCode}
+          onChange={setOtpCode}
+          onSubmit={() => auth.submitOtp(otpCode)}
+          disabled={!showOtp}
+          isSubmitting={auth.isSubmittingOtp}
+          errorMessage={auth.otpError?.message ?? null}
+        />
       </div>
     </div>
   );
