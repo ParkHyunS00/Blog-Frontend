@@ -1,4 +1,5 @@
 import { useState, lazy, Suspense } from "react";
+import { Navigate } from "react-router-dom";
 import { TitleInput } from "@/components/post-write/title-input";
 import { CategorySelect } from "@/components/post-write/category-select";
 import { TagInput } from "@/components/post-write/tag-input";
@@ -6,6 +7,7 @@ import { DraftListDialog } from "@/components/post-write/draft-list-dialog";
 import { Button } from "@/components/ui/button";
 import type { PostWriteForm } from "@/features/post/types/post-write.types";
 import type { Draft } from "@/features/post/types/draft.types";
+import { useAuthStatus } from "@/features/admin-auth/hooks/queries/use-auth-status";
 
 // bundle-dynamic-imports: tiptap + lowlight 번들을 지연 로딩
 const PostEditor = lazy(() =>
@@ -115,13 +117,19 @@ const MOCK_DRAFTS: Draft[] = [
   },
 ];
 
-export function PostWritePage(): React.ReactElement {
+export function PostWritePage(): React.ReactElement | null {
+  const { data: authStatus, isLoading: isAuthLoading } = useAuthStatus();
+  const isAuthenticated = authStatus?.step === "AUTHENTICATED";
+
   const [form, setForm] = useState<PostWriteForm>({
     title: "",
     category: "",
     tags: [],
     content: "",
   });
+
+  if (isAuthLoading) return null;
+  if (!isAuthenticated) return <Navigate to="/" replace />;
 
   function handleTitleChange(title: string): void {
     setForm((prev) => ({ ...prev, title }));
