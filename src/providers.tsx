@@ -7,15 +7,9 @@ import {
 import { useState } from "react";
 import { ApiException } from "@/core/lib/api-client";
 import { authStatusQueryOptions } from "@/features/admin-auth/hooks/queries/use-auth-status";
+import { useApiErrorStore } from "@/core/stores/use-api-error-store";
 
 const ADMIN_AUTH_STATUS_KEY = authStatusQueryOptions.queryKey;
-
-function isAuthError(error: unknown): boolean {
-  return (
-    error instanceof ApiException &&
-    (error.status === 401 || error.status === 403)
-  );
-}
 
 function isAuthStatusQueryKey(key: readonly unknown[]): boolean {
   return (
@@ -27,23 +21,42 @@ function isAuthStatusQueryKey(key: readonly unknown[]): boolean {
 function createQueryClient(): QueryClient {
   const ref: { client: QueryClient | null } = { client: null };
 
-  function handleAuthError(failingQueryKey?: readonly unknown[]): void {
-    if (failingQueryKey && isAuthStatusQueryKey(failingQueryKey)) {
+  function handleApiError(
+    error: unknown,
+    failingQueryKey?: readonly unknown[],
+  ): void {
+    if (!(error instanceof ApiException)) return;
+    const { status } = error;
+    const isAuthStatusFailure = !!failingQueryKey && isAuthStatusQueryKey(failingQueryKey);
+
+    if (status === 401 || status === 403) {
+      if (!isAuthStatusFailure) {
+        ref.client?.invalidateQueries(authStatusQueryOptions);
+      }
+    }
+
+    if (status === 401) {
+      if (isAuthStatusFailure) return;
+      useApiErrorStore.getState().setShouldRedirectToLogin();
       return;
     }
-    ref.client?.invalidateQueries(authStatusQueryOptions);
+
+    if (status === 403) {
+      useApiErrorStore.getState().setErrorKind("FORBIDDEN");
+      return;
+    }
+
+    if (status === 404) {
+      useApiErrorStore.getState().setErrorKind("NOT_FOUND");
+    }
   }
 
   const client = new QueryClient({
     queryCache: new QueryCache({
-      onError: (error, query) => {
-        if (isAuthError(error)) handleAuthError(query.queryKey);
-      },
+      onError: (error, query) => handleApiError(error, query.queryKey),
     }),
     mutationCache: new MutationCache({
-      onError: (error) => {
-        if (isAuthError(error)) handleAuthError();
-      },
+      onError: (error) => handleApiError(error),
     }),
   });
 
