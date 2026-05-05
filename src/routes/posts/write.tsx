@@ -129,7 +129,7 @@ export function PostWritePage(): React.ReactElement | null {
   });
 
   if (isAuthLoading) return null;
-  if (!isAuthenticated) return <Navigate to="/" replace />;
+  if (!isAuthenticated) return <Navigate to="/admin" replace />;
 
   function handleTitleChange(title: string): void {
     setForm((prev) => ({ ...prev, title }));
