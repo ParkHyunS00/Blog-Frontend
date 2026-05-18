@@ -58,14 +58,31 @@ export function PostEditor({ content, onChange, className }: Props): React.React
       attributes: {
         class: "post-content post-editor-content outline-none",
       },
-      handleKeyDown: (_view, event) => {
+      handleKeyDown: (_view, event): boolean => {
         if (!editor) return false;
 
-        // Tab: 4칸 공백 삽입
-        if (event.key === "Tab" && !event.shiftKey) {
+        // Tab: 리스트에서는 들여쓰기/내어쓰기, 일반 문맥에서는 4칸 공백 삽입
+        if (event.key === "Tab") {
+          const isInList = editor.isActive("bulletList") || editor.isActive("orderedList");
+
           event.preventDefault();
-          editor.chain().focus().insertContent("\u00A0\u00A0\u00A0\u00A0").run();
-          return true;
+
+          if (isInList) {
+            if (event.shiftKey) {
+              editor.chain().focus().liftListItem("listItem").run();
+              return true;
+            }
+
+            editor.chain().focus().sinkListItem("listItem").run();
+            return true;
+          }
+
+          if (!event.shiftKey) {
+            editor.chain().focus().insertContent("\u00A0\u00A0\u00A0\u00A0").run();
+            return true;
+          }
+
+          return false;
         }
 
         // Backspace: 빈 리스트 항목에서 리스트 해제 → 일반 텍스트 전환
