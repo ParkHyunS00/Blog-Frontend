@@ -1,6 +1,7 @@
 import { useState, useRef } from "react";
 import { RiCloseLine, RiAddLine, RiCheckLine } from "@remixicon/react";
 import { Badge } from "@/components/ui/badge";
+import { POST_TAG_MAX_LENGTH } from "@/features/post/lib/post-write-constraints";
 import { cn } from "@/lib/utils";
 
 type Props = {
@@ -28,10 +29,14 @@ export function TagInput({ value, onChange, suggestions, maxTags = MAX_TAGS_DEFA
   const showNewTagOption = trimmedInput && !filteredSuggestions.includes(trimmedInput) && !valueSet.has(trimmedInput);
 
   function addTag(tag: string): void {
-    const trimmed = tag.trim();
+    const trimmed = tag.trim().slice(0, POST_TAG_MAX_LENGTH);
     if (!trimmed || valueSet.has(trimmed) || isMaxReached) return;
     onChange([...value, trimmed]);
     setInputValue("");
+  }
+
+  function handleInputChange(e: React.ChangeEvent<HTMLInputElement>): void {
+    setInputValue(e.target.value.slice(0, POST_TAG_MAX_LENGTH));
   }
 
   function removeTag(tag: string): void {
@@ -54,12 +59,12 @@ export function TagInput({ value, onChange, suggestions, maxTags = MAX_TAGS_DEFA
   }
 
   return (
-    <div className="space-y-2">
+    <div className="min-w-0 space-y-2">
       {/* 태그 입력 필드 */}
-      <div className="relative">
+      <div className="relative min-w-0">
         <div
           className={cn(
-            "flex h-10 items-center gap-2 rounded-lg border border-border bg-background px-3 transition-colors",
+            "flex h-10 min-w-0 items-center gap-2 rounded-lg border border-border bg-background px-3 transition-colors",
             isFocused && "border-ring",
             isMaxReached && "opacity-60"
           )}
@@ -67,7 +72,8 @@ export function TagInput({ value, onChange, suggestions, maxTags = MAX_TAGS_DEFA
           <input
             type="text"
             value={inputValue}
-            onChange={(e) => setInputValue(e.target.value)}
+            onChange={handleInputChange}
+            maxLength={POST_TAG_MAX_LENGTH}
             onFocus={() => setIsFocused(true)}
             onBlur={() => setTimeout(() => setIsFocused(false), 150)}
             onKeyDown={handleKeyDown}
@@ -75,7 +81,7 @@ export function TagInput({ value, onChange, suggestions, maxTags = MAX_TAGS_DEFA
             onCompositionEnd={() => { isComposingRef.current = false; }}
             disabled={isMaxReached}
             placeholder={isMaxReached ? "최대 태그 수에 도달했습니다" : "태그 입력 후 Enter"}
-            className="h-full flex-1 bg-transparent text-sm outline-none placeholder:text-muted-foreground disabled:cursor-not-allowed"
+            className="h-full min-w-0 flex-1 bg-transparent text-sm outline-none placeholder:text-muted-foreground disabled:cursor-not-allowed"
           />
           <span className="flex-shrink-0 text-xs text-muted-foreground">
             {value.length}/{maxTags}
@@ -93,10 +99,10 @@ export function TagInput({ value, onChange, suggestions, maxTags = MAX_TAGS_DEFA
                     type="button"
                     onMouseDown={(e) => e.preventDefault()}
                     onClick={() => addTag(suggestion)}
-                    className="flex w-full items-center gap-2 px-4 py-2 text-left text-sm transition-colors hover:bg-secondary"
+                    className="flex w-full min-w-0 items-center gap-2 px-4 py-2 text-left text-sm transition-colors hover:bg-secondary"
                   >
-                    <RiCheckLine size={14} className="text-muted-foreground" />
-                    {suggestion}
+                    <RiCheckLine size={14} className="shrink-0 text-muted-foreground" />
+                    <span className="min-w-0 truncate">{suggestion}</span>
                   </button>
                 ))}
               </div>
@@ -107,10 +113,10 @@ export function TagInput({ value, onChange, suggestions, maxTags = MAX_TAGS_DEFA
                   type="button"
                   onMouseDown={(e) => e.preventDefault()}
                   onClick={() => addTag(inputValue)}
-                  className="flex w-full items-center gap-2 px-4 py-2 text-left text-sm text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
+                  className="flex w-full min-w-0 items-center gap-2 px-4 py-2 text-left text-sm text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
                 >
-                  <RiAddLine size={14} />
-                  &quot;{inputValue.trim()}&quot; 태그 추가
+                  <RiAddLine size={14} className="shrink-0" />
+                  <span className="min-w-0 truncate">&quot;{inputValue.trim()}&quot; 태그 추가</span>
                 </button>
               </div>
             )}
@@ -120,18 +126,19 @@ export function TagInput({ value, onChange, suggestions, maxTags = MAX_TAGS_DEFA
 
       {/* rendering-conditional-render: 삼항 연산자 사용 */}
       {value.length > 0 ? (
-        <div className="flex flex-wrap gap-2">
+        <div className="flex min-w-0 flex-wrap gap-2">
           {value.map((tag) => (
             <Badge
               key={tag}
               variant="secondary"
-              className="gap-1 px-3 py-1 text-xs text-[#305CEC] dark:text-[#5B7FFF]"
+              className="max-w-full min-w-0 gap-1 px-3 py-1 text-xs text-[#305CEC] dark:text-[#5B7FFF]"
             >
-              {tag}
+              <span className="min-w-0 truncate">{tag}</span>
               <button
                 type="button"
                 onClick={() => removeTag(tag)}
-                className="flex items-center justify-center text-muted-foreground transition-colors hover:text-foreground"
+                className="flex shrink-0 items-center justify-center text-muted-foreground transition-colors hover:text-foreground"
+                aria-label={`${tag} 태그 삭제`}
               >
                 <RiCloseLine size={14} />
               </button>
