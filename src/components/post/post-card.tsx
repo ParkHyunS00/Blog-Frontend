@@ -28,8 +28,8 @@ export function PostCard({ post, isLast = false }: PostCardProps): React.ReactEl
         <div className="mt-3 flex flex-col gap-3">
           <div className="flex flex-wrap gap-3">
             {post.tags.map((tag) => (
-              <Badge key={tag} variant="secondary" className="px-3 py-1 text-xs text-[#305CEC] dark:text-[#5B7FFF]">
-                {tag}
+              <Badge key={tag} variant="secondary" className="max-w-full min-w-0 px-3 py-1 text-xs text-[#305CEC] dark:text-[#5B7FFF]">
+                <span className="min-w-0 truncate">{tag}</span>
               </Badge>
             ))}
           </div>

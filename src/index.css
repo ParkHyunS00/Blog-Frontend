@@ -228,8 +228,32 @@
   @apply my-4 list-disc pl-6;
 }
 
+.post-content ul ul {
+  @apply my-1 list-[circle];
+}
+
+.post-content ul ul ul {
+  @apply list-[square];
+}
+
+.post-content ul ul ul ul {
+  @apply list-disc;
+}
+
 .post-content ol {
   @apply my-4 list-decimal pl-6;
+}
+
+.post-content ol ol {
+  @apply my-1 list-[lower-alpha];
+}
+
+.post-content ol ol ol {
+  @apply list-[lower-roman];
+}
+
+.post-content ol ol ol ol {
+  @apply list-decimal;
 }
 
 .post-content li {
@@ -501,7 +525,7 @@
 
 /* Code block within editor */
 .post-editor-content pre {
-  @apply my-6 overflow-hidden rounded-xl p-4 font-mono text-sm;
+  @apply my-6 overflow-hidden rounded-xl p-0 font-mono text-sm;
   background: #fafafa;
 }
 
@@ -510,8 +534,27 @@
   border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
+.post-editor-content pre::before {
+  @apply block h-11 border-b border-black/5;
+  content: "";
+  background:
+    radial-gradient(circle at 18px 50%, #ff5f57 0 6px, transparent 6.5px),
+    radial-gradient(circle at 40px 50%, #febc2e 0 6px, transparent 6.5px),
+    radial-gradient(circle at 62px 50%, #28c840 0 6px, transparent 6.5px),
+    #f0f0f0;
+}
+
+.dark .post-editor-content pre::before {
+  border-color: rgba(255, 255, 255, 0.05);
+  background:
+    radial-gradient(circle at 18px 50%, #ff5f57 0 6px, transparent 6.5px),
+    radial-gradient(circle at 40px 50%, #febc2e 0 6px, transparent 6.5px),
+    radial-gradient(circle at 62px 50%, #28c840 0 6px, transparent 6.5px),
+    #242527;
+}
+
 .post-editor-content pre code {
-  @apply block bg-transparent p-0 text-sm leading-relaxed;
+  @apply block overflow-x-auto bg-transparent p-4 text-sm leading-relaxed;
 }
 
 /* Image figure within editor */

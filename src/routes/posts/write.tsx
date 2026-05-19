@@ -1,10 +1,13 @@
-import { useState, lazy, Suspense } from "react";
+import { useEffect, useState, lazy, Suspense } from "react";
 import { Navigate } from "react-router-dom";
 import { TitleInput } from "@/components/post-write/title-input";
+import { SummaryInput } from "@/components/post-write/summary-input";
+import { ThumbnailInput } from "@/components/post-write/thumbnail-input";
 import { CategorySelect } from "@/components/post-write/category-select";
 import { TagInput } from "@/components/post-write/tag-input";
 import { DraftListDialog } from "@/components/post-write/draft-list-dialog";
 import { Button } from "@/components/ui/button";
+import { POST_TAG_MAX_LENGTH } from "@/features/post/lib/post-write-constraints";
 import type { PostWriteForm } from "@/features/post/types/post-write.types";
 import type { Draft } from "@/features/post/types/draft.types";
 import { useAuthStatus } from "@/features/admin-auth/hooks/queries/use-auth-status";
@@ -123,16 +126,39 @@ export function PostWritePage(): React.ReactElement | null {
 
   const [form, setForm] = useState<PostWriteForm>({
     title: "",
+    summary: "",
+    thumbnailFile: null,
+    thumbnailUrl: "",
     category: "",
     tags: [],
     content: "",
   });
+
+  useEffect(() => {
+    const previewUrl = form.thumbnailUrl;
+
+    return () => {
+      if (previewUrl.startsWith("blob:")) URL.revokeObjectURL(previewUrl);
+    };
+  }, [form.thumbnailUrl]);
 
   if (isAuthLoading) return null;
   if (!isAuthenticated) return <Navigate to="/admin" replace />;
 
   function handleTitleChange(title: string): void {
     setForm((prev) => ({ ...prev, title }));
+  }
+
+  function handleSummaryChange(summary: string): void {
+    setForm((prev) => ({ ...prev, summary }));
+  }
+
+  function handleThumbnailChange(value: { file: File | null; previewUrl: string }): void {
+    setForm((prev) => ({
+      ...prev,
+      thumbnailFile: value.file,
+      thumbnailUrl: value.previewUrl,
+    }));
   }
 
   function handleCategoryChange(category: string): void {
@@ -150,6 +176,16 @@ export function PostWritePage(): React.ReactElement | null {
   function handleDraftSelect(draft: Draft): void {
     // TODO: 추후 API 연동
     console.log("불러오기:", draft);
+    setForm((prev) => ({
+      ...prev,
+      title: draft.title,
+      summary: draft.summary ?? "",
+      thumbnailFile: null,
+      thumbnailUrl: draft.thumbnailUrl ?? "",
+      category: draft.category,
+      tags: draft.tags,
+      content: draft.content,
+    }));
   }
 
   function handleDraft(): void {
@@ -168,9 +204,20 @@ export function PostWritePage(): React.ReactElement | null {
         {/* 제목 */}
         <TitleInput value={form.title} onChange={handleTitleChange} />
 
+        {/* 목록 미리보기 정보 */}
+        <div className="space-y-5">
+          <SummaryInput value={form.summary} onChange={handleSummaryChange} />
+          <div className="max-w-[460px]">
+            <ThumbnailInput
+              value={{ file: form.thumbnailFile, previewUrl: form.thumbnailUrl }}
+              onChange={handleThumbnailChange}
+            />
+          </div>
+        </div>
+
         {/* 카테고리 & 태그 */}
-        <div className="grid gap-4 md:grid-cols-2">
-          <div className="space-y-2">
+        <div className="grid gap-4 md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
+          <div className="min-w-0 space-y-2">
             <label className="text-sm font-medium text-muted-foreground">카테고리</label>
             <CategorySelect
               value={form.category}
@@ -178,8 +225,13 @@ export function PostWritePage(): React.ReactElement | null {
               categories={MOCK_CATEGORIES}
             />
           </div>
-          <div className="space-y-2">
-            <label className="text-sm font-medium text-muted-foreground">태그</label>
+          <div className="min-w-0 space-y-2">
+            <div className="flex items-center justify-between gap-3">
+              <label className="text-sm font-medium text-muted-foreground">태그</label>
+              <span className="truncate text-xs text-muted-foreground">
+                태그는 최대 {POST_TAG_MAX_LENGTH}자까지 입력할 수 있습니다.
+              </span>
+            </div>
             <TagInput
               value={form.tags}
               onChange={handleTagsChange}
