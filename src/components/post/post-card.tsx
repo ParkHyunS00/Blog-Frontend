@@ -1,23 +1,36 @@
 import { Link } from "react-router-dom";
+import { RiImageLine } from "@remixicon/react";
 import { Badge } from "@/components/ui/badge";
 import type { Post } from "@/features/post/types/post.types";
 
 type PostCardProps = {
   post: Post;
   isLast?: boolean;
+  priority?: boolean;
 };
 
-export function PostCard({ post, isLast = false }: PostCardProps): React.ReactElement {
+export function PostCard({ post, isLast = false, priority = false }: PostCardProps): React.ReactElement {
   return (
     <Link
       to={`/posts/${post.id}`}
       className={`group flex flex-col gap-4 py-10 sm:flex-row sm:gap-6 ${isLast ? "" : "border-b border-border"}`}
     >
-      <img
-        src={post.thumbnailUrl}
-        alt={post.title}
-        className="h-[180px] w-full flex-shrink-0 rounded-lg object-cover sm:h-[160px] sm:w-[230px]"
-      />
+      {post.thumbnailUrl ? (
+        <img
+          src={post.thumbnailUrl}
+          alt={post.title}
+          loading={priority ? "eager" : "lazy"}
+          fetchPriority={priority ? "high" : "auto"}
+          className="h-[180px] w-full flex-shrink-0 rounded-lg object-cover sm:h-[160px] sm:w-[230px]"
+        />
+      ) : (
+        <div
+          className="flex h-[180px] w-full flex-shrink-0 items-center justify-center rounded-lg bg-muted text-muted-foreground sm:h-[160px] sm:w-[230px]"
+          aria-label="썸네일 없음"
+        >
+          <RiImageLine size={32} aria-hidden="true" />
+        </div>
+      )}
 
       <div className="flex min-w-0 flex-1 flex-col justify-between overflow-hidden border-r-4 border-r-transparent py-1 pr-2 transition-colors group-hover:border-r-[#305CEC] dark:group-hover:border-r-[#5B7FFF]">
         <div>

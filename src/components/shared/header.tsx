@@ -18,7 +18,6 @@ import {
   DropdownMenuItem,
 } from "@/components/ui/dropdown-menu";
 import { useThemeStore } from "@/core/stores/use-theme-store";
-import { useCategoryStore } from "@/core/stores/use-category-store";
 import { useAuthStatus } from "@/features/admin-auth/hooks/queries/use-auth-status";
 import { useLogoutMutation } from "@/features/admin-auth/hooks/mutations/use-logout-mutation";
 
@@ -54,10 +53,6 @@ export function Header(): React.ReactElement {
   const isAuthenticated = authStatus?.step === "AUTHENTICATED";
   const navigate = useNavigate();
   const logoutMutation = useLogoutMutation();
-
-  function handleLogoClick(): void {
-    useCategoryStore.getState().setSelectedCategory("ALL");
-  }
 
   function handleLogin(): void {
     navigate("/admin");
@@ -100,7 +95,7 @@ export function Header(): React.ReactElement {
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border bg-background ">
       <div className="mx-auto flex h-14 max-w-screen-xl items-center justify-between px-4">
-        <Link to="/" className="flex-shrink-0" onClick={handleLogoClick}>
+        <Link to="/" className="flex-shrink-0">
           <img src="/logo.svg" alt="ParkHyunSOO" className="h-7 dark:invert" />
         </Link>
 

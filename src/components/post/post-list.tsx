@@ -15,7 +15,7 @@ export function PostList({ posts }: PostListProps): React.ReactElement {
     <div className="flex flex-col">
       {posts.map((post, index) => (
         <div key={post.id} style={CARD_STYLE}>
-          <PostCard post={post} isLast={index === posts.length - 1} />
+          <PostCard post={post} isLast={index === posts.length - 1} priority={index === 0} />
         </div>
       ))}
     </div>
