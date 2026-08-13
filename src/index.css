@@ -136,11 +136,6 @@
   @apply text-base leading-relaxed text-foreground;
 }
 
-.post-content .code-block-wrapper {
-  content-visibility: auto;
-  contain-intrinsic-size: 0 200px;
-}
-
 .post-content h1 {
   @apply mt-16 mb-6 text-3xl font-bold;
 }

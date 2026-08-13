@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import { useParams } from "react-router-dom";
 import { PostDetailLayout } from "@/components/post-detail/post-detail-layout";
 import { PostDetailHeader } from "@/components/post-detail/post-detail-header";
@@ -13,7 +14,7 @@ import { useActiveToc } from "@/features/post/hooks/use-active-toc";
 export function PostDetailPage(): React.ReactElement {
   const { id } = useParams<{ id: string }>();
   const post = findPostDetailById(Number(id));
-  const tocItems = parseToc(post?.content ?? "");
+  const tocItems = useMemo(() => parseToc(post?.content ?? ""), [post?.content]);
   const { activeId, handleTocClick } = useActiveToc(tocItems);
 
   if (!post) return <ErrorPage kind="NOT_FOUND" />;

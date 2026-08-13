@@ -29,13 +29,13 @@ export function PostDetailToc({ items, activeId, onItemClick }: PostDetailTocPro
                     href={`#${item.id}`}
                     onClick={(e) => handleClick(e, item.id)}
                     className={cn(
-                      "block text-sm transition-colors",
+                      "block text-sm font-medium transition-colors",
                       item.level === 3 && "pl-3",
                       isActive
-                        ? "font-bold text-foreground"
+                        ? "text-foreground"
                         : item.level === 3
                           ? "text-muted-foreground hover:text-[#305CEC] dark:hover:text-[#5B7FFF]"
-                          : "font-medium text-muted-foreground hover:text-[#305CEC] dark:hover:text-[#5B7FFF]",
+                          : "text-muted-foreground hover:text-[#305CEC] dark:hover:text-[#5B7FFF]",
                     )}
                   >
                     {item.text}
