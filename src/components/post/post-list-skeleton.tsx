@@ -10,14 +10,13 @@ export function PostListSkeleton(): React.ReactElement {
             item === SKELETON_ITEMS.length - 1 ? "" : "border-b border-border"
           }`}
         >
-          <div className="h-[180px] w-full shrink-0 rounded-lg bg-muted sm:h-[160px] sm:w-[230px]" />
-          <div className="flex min-w-0 flex-1 flex-col justify-between overflow-hidden border-r-4 border-r-transparent py-1 pr-2">
+          <div className="flex min-w-0 flex-1 flex-col overflow-hidden border-r-4 border-r-transparent py-1 pr-2">
             <div>
               <div className="h-7 w-3/5 rounded-md bg-muted" />
-              <div className="mt-2 h-6 w-full rounded-md bg-muted" />
+              <div className="mt-3 h-6 w-full rounded-md bg-muted" />
               <div className="mt-1 h-6 w-4/5 rounded-md bg-muted" />
             </div>
-            <div className="mt-3 flex flex-col gap-3">
+            <div className="mt-5 flex flex-col gap-5">
               <div className="flex gap-3">
                 <div className="h-6 w-16 rounded-full bg-muted" />
                 <div className="h-6 w-20 rounded-full bg-muted" />
@@ -29,6 +28,7 @@ export function PostListSkeleton(): React.ReactElement {
               </div>
             </div>
           </div>
+          <div className="h-[180px] w-full shrink-0 rounded-lg bg-muted sm:h-[160px] sm:w-[230px]" />
         </div>
       ))}
     </div>

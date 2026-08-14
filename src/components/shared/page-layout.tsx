@@ -24,7 +24,7 @@ export function PageLayout({
   const [isMobilePanelOpen, setIsMobilePanelOpen] = useState(false);
 
   return (
-    <main className="mx-auto flex w-full max-w-screen-2xl gap-1 px-4 py-8 md:gap-16">
+    <main className="mx-auto flex w-full max-w-screen-2xl gap-1 px-4 py-8 md:gap-20">
       <CategorySidebar
         categories={categories}
         isLoading={isCategoriesLoading}
