@@ -17,7 +17,9 @@ export interface TocItem {
 export interface PostDetail {
   id: number;
   title: string;
+  summary: string;
   category: string;
   createdAt: string;
   content: string;
+  tags: string[];
 }

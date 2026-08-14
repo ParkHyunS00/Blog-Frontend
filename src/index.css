@@ -196,11 +196,11 @@
 }
 
 .post-content blockquote {
-  @apply my-8 border-l-4 border-muted-foreground/40 pl-4 text-[#305CEC] dark:text-[#5B7FFF];
+  @apply my-8 border-l-4 border-muted-foreground/40 pl-4 text-[#ffa348];
 }
 
 .post-content blockquote h3 {
-  @apply mt-0 mb-0 text-lg font-semibold text-[#305CEC] dark:text-[#5B7FFF];
+  @apply mt-0 mb-0 text-lg font-semibold text-[#ffa348];
 }
 
 .post-content [data-type="callout"] {

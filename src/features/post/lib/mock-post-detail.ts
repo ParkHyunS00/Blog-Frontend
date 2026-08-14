@@ -3,8 +3,10 @@ import type { PostDetail } from "@/features/post/types/post.types";
 export const mockPostDetail: PostDetail = {
   id: 1,
   title: "ghostty 터미널을 3개월 사용해본 솔직 후기",
+  summary: "Ghostty를 3개월간 실무에서 사용하며 느낀 장단점과 설정 경험을 정리합니다.",
   category: "DX",
   createdAt: "2026.02.01 18:25",
+  tags: ["Ghostty", "Terminal", "DX"],
   content: `
     <p>최근 개발자 커뮤니티에서 ghostty라는 터미널 에뮬레이터가 화제입니다. Zig 언어로 작성되었고, GPU 가속 렌더링을 지원하며, 기존 iTerm2나 Alacritty 대비 성능이 크게 향상되었다는 평가를 받고 있죠. 저도 약 3개월 전부터 메인 터미널을 ghostty로 교체하여 실무에서 사용해왔습니다.</p>
 
