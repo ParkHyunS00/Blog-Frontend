@@ -11,6 +11,7 @@ import { mapPostListItem } from "@/features/post/api/post-list";
 import { usePostList } from "@/features/post/hooks/queries/use-post-list";
 import { normalizePostPage } from "@/features/post/lib/normalize-post-page";
 import {
+  getSearchKeyword,
   getSelectedCategorySlug,
   searchParamsForPage,
 } from "@/features/post/lib/post-list-search-params";
@@ -20,11 +21,13 @@ const POSTS_PER_PAGE = 5;
 export function HomePage(): React.ReactElement {
   const [searchParams, setSearchParams] = useSearchParams();
   const selectedCategorySlug = getSelectedCategorySlug(searchParams);
+  const searchKeyword = getSearchKeyword(searchParams);
   const rawPage = Number(searchParams.get("page"));
   const currentPage = Number.isInteger(rawPage) && rawPage > 0 ? rawPage : 1;
 
   const postListQuery = usePostList({
     category: selectedCategorySlug ?? undefined,
+    keyword: searchKeyword ?? undefined,
     page: currentPage - 1,
     size: POSTS_PER_PAGE,
   });
@@ -61,7 +64,9 @@ export function HomePage(): React.ReactElement {
         </p>
       ) : null}
       {postListQuery.isSuccess && normalizedPage === currentPage && posts.length === 0 ? (
-        <p className="py-20 text-center text-muted-foreground">게시글이 없습니다.</p>
+        <p className="py-20 text-center text-muted-foreground">
+          {searchKeyword ? "검색 결과가 없습니다." : "게시글이 없습니다."}
+        </p>
       ) : null}
       {postListQuery.isSuccess && normalizedPage === currentPage && posts.length > 0 ? (
         <PostList posts={posts} />

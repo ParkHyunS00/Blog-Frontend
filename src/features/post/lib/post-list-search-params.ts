@@ -2,6 +2,30 @@ export function getSelectedCategorySlug(searchParams: URLSearchParams): string |
   return searchParams.get("category") || null;
 }
 
+export function getSearchKeyword(searchParams: URLSearchParams): string | null {
+  return searchParams.get("keyword")?.trim() || null;
+}
+
+export function searchParamsForKeyword(
+  currentSearchParams: URLSearchParams,
+  keyword: string,
+): URLSearchParams {
+  const nextSearchParams = new URLSearchParams(currentSearchParams);
+  const normalizedKeyword = keyword.trim();
+
+  if (normalizedKeyword) {
+    nextSearchParams.set("keyword", normalizedKeyword);
+  } else {
+    nextSearchParams.delete("keyword");
+  }
+
+  nextSearchParams.delete("category");
+  nextSearchParams.delete("tags");
+  nextSearchParams.delete("page");
+
+  return nextSearchParams;
+}
+
 export function searchParamsForCategory(
   currentSearchParams: URLSearchParams,
   categorySlug: string | null,
@@ -13,6 +37,7 @@ export function searchParamsForCategory(
   } else {
     nextSearchParams.delete("category");
   }
+  nextSearchParams.delete("keyword");
   nextSearchParams.delete("page");
 
   return nextSearchParams;
