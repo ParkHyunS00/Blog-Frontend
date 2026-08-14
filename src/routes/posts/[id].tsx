@@ -8,6 +8,7 @@ import { PostDetailTocMobile } from "@/components/post-detail/post-detail-toc-mo
 import { PostDetailComments } from "@/components/post-detail/post-detail-comments";
 import { PostDetailTags } from "@/components/post-detail/post-detail-tags";
 import { PostDetailSummary } from "@/components/post-detail/post-detail-summary";
+import { PostDetailSkeleton } from "@/components/post-detail/post-detail-skeleton";
 import { ErrorPage } from "@/components/shared/error-page";
 import { ApiException } from "@/core/lib/api-client";
 import { mapPostDetail } from "@/features/post/api/post-detail";
@@ -33,11 +34,7 @@ export function PostDetailPage(): React.ReactElement {
   if (!isValidPostId) return <ErrorPage kind="NOT_FOUND" />;
 
   if (postDetailQuery.isPending) {
-    return (
-      <div className="flex flex-1 items-center justify-center px-4 py-24 text-muted-foreground">
-        게시글을 불러오는 중입니다.
-      </div>
-    );
+    return <PostDetailSkeleton />;
   }
 
   if (postDetailQuery.isError) {
