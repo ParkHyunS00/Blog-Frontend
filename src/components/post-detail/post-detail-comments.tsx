@@ -7,7 +7,7 @@ export function PostDetailComments(): React.ReactElement {
   const isDark = useThemeStore((state) => state.theme === "dark");
 
   return (
-    <section className="mt-16 border-t border-border pt-10">
+    <section className="mt-12 border-t border-border pt-10">
       <Suspense fallback={null}>
         <Giscus
           repo="ParkHyunS00/Blog-Frontend"

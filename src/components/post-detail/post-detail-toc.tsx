@@ -14,8 +14,8 @@ export function PostDetailToc({ items, activeId, onItemClick }: PostDetailTocPro
   }
 
   return (
-    <nav className="hidden lg:block" aria-label="목차">
-      <div className="sticky top-24 w-48">
+    <nav className="hidden h-full min-[1344px]:block" aria-label="목차">
+      <div className="sticky top-40 w-48">
         <div className="relative pl-4">
           <span className="absolute left-0 top-0 h-full w-0.5 bg-border" />
           <ul className="relative space-y-2">
@@ -29,13 +29,13 @@ export function PostDetailToc({ items, activeId, onItemClick }: PostDetailTocPro
                     href={`#${item.id}`}
                     onClick={(e) => handleClick(e, item.id)}
                     className={cn(
-                      "block text-sm transition-colors",
+                      "block origin-left text-sm font-medium transition-[transform,color] duration-200",
                       item.level === 3 && "pl-3",
                       isActive
-                        ? "font-bold text-foreground"
+                        ? "scale-[1.08] text-foreground"
                         : item.level === 3
                           ? "text-muted-foreground hover:text-[#305CEC] dark:hover:text-[#5B7FFF]"
-                          : "font-medium text-muted-foreground hover:text-[#305CEC] dark:hover:text-[#5B7FFF]",
+                          : "text-muted-foreground hover:text-[#305CEC] dark:hover:text-[#5B7FFF]",
                     )}
                   >
                     {item.text}

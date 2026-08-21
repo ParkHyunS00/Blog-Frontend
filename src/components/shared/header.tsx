@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import {
   RiSearchLine,
   RiMoonLine,
@@ -18,9 +18,12 @@ import {
   DropdownMenuItem,
 } from "@/components/ui/dropdown-menu";
 import { useThemeStore } from "@/core/stores/use-theme-store";
-import { useCategoryStore } from "@/core/stores/use-category-store";
 import { useAuthStatus } from "@/features/admin-auth/hooks/queries/use-auth-status";
 import { useLogoutMutation } from "@/features/admin-auth/hooks/mutations/use-logout-mutation";
+import {
+  getSearchKeyword,
+  searchParamsForKeyword,
+} from "@/features/post/lib/post-list-search-params";
 
 const NAV_ITEMS = [
   { label: "ABOUT", path: "/about" },
@@ -36,8 +39,8 @@ const MOBILE_NAV_LINK_CLASS =
 const ICON_BUTTON_CLASS =
   "flex h-9 w-9 items-center justify-center rounded-full text-foreground/80 transition-colors hover:bg-secondary hover:text-foreground";
 
-const SEARCH_ICON_CLASS =
-  "absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground";
+const SEARCH_BUTTON_CLASS =
+  "absolute left-0 top-0 flex h-full w-9 items-center justify-center text-muted-foreground transition-colors hover:text-foreground";
 
 const WritePostLink = (
   <Link to="/posts/write" className={ICON_BUTTON_CLASS} aria-label="게시글 작성">
@@ -46,18 +49,15 @@ const WritePostLink = (
 );
 
 export function Header(): React.ReactElement {
+  const location = useLocation();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [searchValue, setSearchValue] = useState("");
+  const searchKeyword = getSearchKeyword(new URLSearchParams(location.search)) ?? "";
   const isLightTheme = useThemeStore((state) => state.theme === "light");
   const toggleTheme = useThemeStore((state) => state.toggleTheme);
   const { data: authStatus } = useAuthStatus();
   const isAuthenticated = authStatus?.step === "AUTHENTICATED";
   const navigate = useNavigate();
   const logoutMutation = useLogoutMutation();
-
-  function handleLogoClick(): void {
-    useCategoryStore.getState().setSelectedCategory("ALL");
-  }
 
   function handleLogin(): void {
     navigate("/admin");
@@ -79,8 +79,17 @@ export function Header(): React.ReactElement {
     handleMobileMenuClose();
   }
 
-  function handleSearchChange(e: React.ChangeEvent<HTMLInputElement>): void {
-    setSearchValue(e.target.value);
+  function handleSearchSubmit(e: React.FormEvent<HTMLFormElement>): void {
+    e.preventDefault();
+    const submittedKeyword = new FormData(e.currentTarget).get("keyword");
+    const nextSearchParams = searchParamsForKeyword(
+      new URLSearchParams(location.search),
+      typeof submittedKeyword === "string" ? submittedKeyword : "",
+    );
+    const nextSearch = nextSearchParams.toString();
+
+    setIsMobileMenuOpen(false);
+    navigate({ pathname: "/", search: nextSearch ? `?${nextSearch}` : "" });
   }
 
   function handleMobileMenuToggle(): void {
@@ -100,7 +109,7 @@ export function Header(): React.ReactElement {
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border bg-background ">
       <div className="mx-auto flex h-14 max-w-screen-xl items-center justify-between px-4">
-        <Link to="/" className="flex-shrink-0" onClick={handleLogoClick}>
+        <Link to="/" className="flex-shrink-0">
           <img src="/logo.svg" alt="ParkHyunSOO" className="h-7 dark:invert" />
         </Link>
 
@@ -116,16 +125,24 @@ export function Header(): React.ReactElement {
         {/* Desktop Actions */}
         <div className="hidden items-center gap-2 md:flex">
           {/* Search Input */}
-          <div className="relative mr-8">
-            <RiSearchLine size={18} className={SEARCH_ICON_CLASS} />
+          <form
+            key={`desktop-${location.search}`}
+            className="relative mr-8"
+            role="search"
+            onSubmit={handleSearchSubmit}
+          >
+            <button type="submit" className={SEARCH_BUTTON_CLASS} aria-label="게시글 검색">
+              <RiSearchLine size={18} />
+            </button>
             <input
-              type="text"
-              value={searchValue}
-              onChange={handleSearchChange}
-              placeholder=""
+              type="search"
+              name="keyword"
+              defaultValue={searchKeyword}
+              placeholder="게시글 검색"
+              aria-label="검색어"
               className="h-9 w-52 rounded-full bg-secondary pl-9 pr-4 text-sm outline-none placeholder:text-muted-foreground focus:ring-2 focus:ring-ring"
             />
-          </div>
+          </form>
 
           {/* Dark Mode Toggle */}
           <button
@@ -184,15 +201,24 @@ export function Header(): React.ReactElement {
       >
         <div className="space-y-4 px-4 py-4">
           {/* Mobile Search */}
-          <div className="relative">
-            <RiSearchLine size={18} className={SEARCH_ICON_CLASS} />
+          <form
+            key={`mobile-${location.search}`}
+            className="relative"
+            role="search"
+            onSubmit={handleSearchSubmit}
+          >
+            <button type="submit" className={SEARCH_BUTTON_CLASS} aria-label="게시글 검색">
+              <RiSearchLine size={18} />
+            </button>
             <input
-              type="text"
-              value={searchValue}
-              onChange={handleSearchChange}
+              type="search"
+              name="keyword"
+              defaultValue={searchKeyword}
+              placeholder="게시글 검색"
+              aria-label="검색어"
               className="h-10 w-full rounded-full bg-secondary pl-9 pr-4 text-sm outline-none placeholder:text-muted-foreground focus:ring-2 focus:ring-ring"
             />
-          </div>
+          </form>
 
           {/* Mobile Navigation */}
           <nav className="flex flex-col gap-2">

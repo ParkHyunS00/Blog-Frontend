@@ -1,3 +1,5 @@
+import DOMPurify from "dompurify";
+import { useMemo } from "react";
 import { processCodeBlocks } from "@/features/post/lib/highlight-code";
 
 type PostDetailContentProps = {
@@ -5,7 +7,10 @@ type PostDetailContentProps = {
 };
 
 export function PostDetailContent({ content }: PostDetailContentProps): React.ReactElement {
-  const processedContent = processCodeBlocks(content);
+  const sanitizedContent = useMemo(
+    () => DOMPurify.sanitize(processCodeBlocks(content)),
+    [content],
+  );
 
   function handleClick(e: React.MouseEvent<HTMLElement>): void {
     const target = e.target as HTMLElement;
@@ -26,7 +31,7 @@ export function PostDetailContent({ content }: PostDetailContentProps): React.Re
     <article
       className="post-content"
       onClick={handleClick}
-      dangerouslySetInnerHTML={{ __html: processedContent }}
+      dangerouslySetInnerHTML={{ __html: sanitizedContent }}
     />
   );
 }

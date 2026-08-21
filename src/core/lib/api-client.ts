@@ -3,7 +3,7 @@ import { getCsrfToken } from "@/core/lib/csrf";
 import { standardResponseSchema } from "@/core/lib/standard-response";
 import type { ApiError } from "@/core/types/api.types";
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? "";
 
 const MUTATING_METHODS = new Set(["POST", "PUT", "PATCH", "DELETE"]);
 
