@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import Underline from "@tiptap/extension-underline";
@@ -14,17 +15,24 @@ import { Callout } from "@/components/post-write/extensions/callout";
 import { ImageWithCaption } from "@/components/post-write/extensions/image-with-caption";
 import { EditorToolbar } from "@/components/post-write/editor-toolbar";
 import { ClearMarksOnEnter } from "@/components/post-write/extensions/clear-marks-on-enter";
+import { getEditorIndentationText } from "@/components/post-write/editor-indentation";
 import { cn } from "@/lib/utils";
+import { API_BASE_URL } from "@/core/lib/api-client";
+import {
+  toPostImageDisplayHtml,
+  toPostImageStorageHtml,
+} from "@/features/post/lib/post-image-url";
 
 const lowlight = createLowlight(common);
 
 type Props = {
   content: string;
   onChange: (html: string) => void;
+  onUploadImage: (file: File) => Promise<string>;
   className?: string;
 };
 
-export function PostEditor({ content, onChange, className }: Props): React.ReactElement {
+export function PostEditor({ content, onChange, onUploadImage, className }: Props): React.ReactElement {
   const editor = useEditor({
     extensions: [
       StarterKit.configure({
@@ -50,9 +58,9 @@ export function PostEditor({ content, onChange, className }: Props): React.React
       ImageWithCaption,
       ClearMarksOnEnter,
     ],
-    content,
+    content: toPostImageDisplayHtml(content, API_BASE_URL),
     onUpdate: ({ editor: e }) => {
-      onChange(e.getHTML());
+      onChange(toPostImageStorageHtml(e.getHTML(), API_BASE_URL));
     },
     editorProps: {
       attributes: {
@@ -78,7 +86,11 @@ export function PostEditor({ content, onChange, className }: Props): React.React
           }
 
           if (!event.shiftKey) {
-            editor.chain().focus().insertContent("\u00A0\u00A0\u00A0\u00A0").run();
+            editor
+              .chain()
+              .focus()
+              .insertContent(getEditorIndentationText(editor.isActive("codeBlock")))
+              .run();
             return true;
           }
 
@@ -105,12 +117,17 @@ export function PostEditor({ content, onChange, className }: Props): React.React
     },
   });
 
+  useEffect(() => {
+    if (!editor || toPostImageStorageHtml(editor.getHTML(), API_BASE_URL) === content) return;
+    editor.commands.setContent(toPostImageDisplayHtml(content, API_BASE_URL), { emitUpdate: false });
+  }, [content, editor]);
+
   if (!editor) return <div />;
 
   return (
     <div className={cn("flex flex-col rounded-lg border border-border bg-background transition-colors focus-within:border-ring", className)}>
       <div className="relative z-10">
-        <EditorToolbar editor={editor} />
+        <EditorToolbar editor={editor} onUploadImage={onUploadImage} />
       </div>
       <div className="min-h-0 flex-1 overflow-y-auto rounded-b-lg px-2 py-4 sm:px-4">
         <EditorContent editor={editor} />

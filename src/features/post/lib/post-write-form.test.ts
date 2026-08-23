@@ -8,9 +8,11 @@ const emptyForm: PostWriteForm = {
   summary: "",
   thumbnailFile: null,
   thumbnailUrl: "",
+  thumbnailImageId: null,
   category: "",
   tags: [],
   content: "<p></p><p><br></p>",
+  contentImageIds: [],
 };
 
 test("텍스트가 없는 Tiptap 기본 마크업은 작성 중인 내용으로 보지 않는다", () => {

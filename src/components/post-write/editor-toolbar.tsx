@@ -21,9 +21,10 @@ import { ImageButton } from "@/components/post-write/toolbar/image-button";
 
 type Props = {
   editor: Editor;
+  onUploadImage: (file: File) => Promise<string>;
 };
 
-export function EditorToolbar({ editor }: Props): React.ReactElement {
+export function EditorToolbar({ editor, onUploadImage }: Props): React.ReactElement {
   const activeStates = useEditorState({
     editor,
     selector: ({ editor: e }) => ({
@@ -87,7 +88,7 @@ export function EditorToolbar({ editor }: Props): React.ReactElement {
       <ToolbarDivider />
 
       <LinkButton editor={editor} />
-      <ImageButton editor={editor} />
+      <ImageButton editor={editor} onUploadImage={onUploadImage} />
       <TableDropdown editor={editor} />
       <ToolbarButton onClick={() => editor.chain().focus().setHorizontalRule().run()} title="구분선">
         <RiSeparator size={18} />

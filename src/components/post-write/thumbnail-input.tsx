@@ -15,10 +15,12 @@ type ThumbnailValue = {
 
 type Props = {
   value: ThumbnailValue;
-  onChange: (value: ThumbnailValue) => void;
+  onChange: (value: ThumbnailValue) => void | Promise<void>;
+  isUploading?: boolean;
+  uploadError?: string;
 };
 
-export function ThumbnailInput({ value, onChange }: Props): React.ReactElement {
+export function ThumbnailInput({ value, onChange, isUploading = false, uploadError = "" }: Props): React.ReactElement {
   const inputRef = useRef<HTMLInputElement>(null);
   const [error, setError] = useState("");
 
@@ -45,9 +47,13 @@ export function ThumbnailInput({ value, onChange }: Props): React.ReactElement {
     const previewUrl = URL.createObjectURL(file);
     const image = new Image();
 
-    image.onload = () => {
+    image.onload = async () => {
       setError("");
-      onChange({ file, previewUrl });
+      try {
+        await onChange({ file, previewUrl });
+      } finally {
+        URL.revokeObjectURL(previewUrl);
+      }
     };
 
     image.onerror = () => {
@@ -80,6 +86,7 @@ export function ThumbnailInput({ value, onChange }: Props): React.ReactElement {
       <button
         type="button"
         onClick={handleClick}
+        disabled={isUploading}
         className="group relative flex aspect-[23/16] w-full items-center justify-center overflow-hidden rounded-md border border-dashed border-border bg-secondary/40 text-left transition-colors hover:border-ring hover:bg-secondary focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-none"
       >
         {value.previewUrl ? (
@@ -91,18 +98,19 @@ export function ThumbnailInput({ value, onChange }: Props): React.ReactElement {
         ) : (
           <span className="flex flex-col items-center gap-2 px-4 text-center text-sm text-muted-foreground">
             <ImagePlus className="size-6" />
-            썸네일 이미지 선택
+            {isUploading ? "썸네일 업로드 중..." : "썸네일 이미지 선택"}
           </span>
         )}
       </button>
 
       <input ref={inputRef} type="file" accept={THUMBNAIL_ACCEPT} onChange={handleFileChange} className="sr-only" />
 
-      <div className="space-y-1">
+      <div className="space-y-1 text-center">
         <p className="text-xs text-muted-foreground">
           저장 시 목록 비율({THUMBNAIL_TARGET_WIDTH}x{THUMBNAIL_TARGET_HEIGHT})에 맞춰 리사이즈 후 중앙 기준으로 잘라내는 방식이 적합합니다.
         </p>
         {error ? <p className="text-xs font-medium text-destructive">{error}</p> : null}
+        {uploadError ? <p className="text-xs font-medium text-destructive">{uploadError}</p> : null}
       </div>
     </div>
   );
