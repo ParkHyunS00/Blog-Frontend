@@ -1,6 +1,8 @@
 import DOMPurify from "dompurify";
 import { useMemo } from "react";
 import { processCodeBlocks } from "@/features/post/lib/highlight-code";
+import { API_BASE_URL } from "@/core/lib/api-client";
+import { toPostImageDisplayHtml } from "@/features/post/lib/post-image-url";
 
 type PostDetailContentProps = {
   content: string;
@@ -8,7 +10,7 @@ type PostDetailContentProps = {
 
 export function PostDetailContent({ content }: PostDetailContentProps): React.ReactElement {
   const sanitizedContent = useMemo(
-    () => DOMPurify.sanitize(processCodeBlocks(content)),
+    () => DOMPurify.sanitize(processCodeBlocks(toPostImageDisplayHtml(content, API_BASE_URL))),
     [content],
   );
 
