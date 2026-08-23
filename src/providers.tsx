@@ -8,6 +8,7 @@ import { useState } from "react";
 import { ApiException } from "@/core/lib/api-client";
 import { authStatusQueryOptions } from "@/features/admin-auth/hooks/queries/use-auth-status";
 import { useApiErrorStore } from "@/core/stores/use-api-error-store";
+import { ToastProvider } from "@/components/ui/toast-provider";
 
 const ADMIN_AUTH_STATUS_KEY = authStatusQueryOptions.queryKey;
 
@@ -66,5 +67,9 @@ function createQueryClient(): QueryClient {
 
 export function Providers({ children }: { children: React.ReactNode }): React.ReactElement {
   const [queryClient] = useState(createQueryClient);
-  return <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>;
+  return (
+    <QueryClientProvider client={queryClient}>
+      <ToastProvider>{children}</ToastProvider>
+    </QueryClientProvider>
+  );
 }
