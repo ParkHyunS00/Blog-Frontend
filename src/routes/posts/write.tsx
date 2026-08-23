@@ -8,6 +8,8 @@ import { TagInput } from "@/components/post-write/tag-input";
 import { DraftListDialog } from "@/components/post-write/draft-list-dialog";
 import { Button } from "@/components/ui/button";
 import { POST_TAG_MAX_LENGTH } from "@/features/post/lib/post-write-constraints";
+import { removeDraftById } from "@/features/post/lib/draft-list";
+import { hasPostWriteContent } from "@/features/post/lib/post-write-form";
 import type { PostWriteForm } from "@/features/post/types/post-write.types";
 import type { Draft } from "@/features/post/types/draft.types";
 import { useAuthStatus } from "@/features/admin-auth/hooks/queries/use-auth-status";
@@ -133,6 +135,7 @@ export function PostWritePage(): React.ReactElement | null {
     tags: [],
     content: "",
   });
+  const [drafts, setDrafts] = useState<Draft[]>(MOCK_DRAFTS);
 
   useEffect(() => {
     const previewUrl = form.thumbnailUrl;
@@ -173,7 +176,7 @@ export function PostWritePage(): React.ReactElement | null {
     setForm((prev) => ({ ...prev, content }));
   }
 
-  function handleDraftSelect(draft: Draft): void {
+  function loadDraft(draft: Draft): void {
     // TODO: 추후 API 연동
     console.log("불러오기:", draft);
     setForm((prev) => ({
@@ -188,9 +191,18 @@ export function PostWritePage(): React.ReactElement | null {
     }));
   }
 
+  function handleDraftSelect(draft: Draft): void {
+    loadDraft(draft);
+  }
+
   function handleDraft(): void {
     // TODO: 추후 API 연동
     console.log("임시 저장:", form);
+  }
+
+  function handleDraftDelete(draftId: string): void {
+    // TODO: 임시 저장 삭제 API 연동 시 성공 응답 후 목록에서 제거
+    setDrafts((currentDrafts) => removeDraftById(currentDrafts, draftId));
   }
 
   function handlePublish(): void {
@@ -251,7 +263,12 @@ export function PostWritePage(): React.ReactElement | null {
 
         {/* 액션 버튼 */}
         <div className="flex items-center justify-end gap-3">
-          <DraftListDialog drafts={MOCK_DRAFTS} onSelect={handleDraftSelect} />
+          <DraftListDialog
+            drafts={drafts}
+            hasUnsavedContent={hasPostWriteContent(form)}
+            onSelect={handleDraftSelect}
+            onDelete={handleDraftDelete}
+          />
           <Button variant="outline" onClick={handleDraft}>
             임시 저장
           </Button>
