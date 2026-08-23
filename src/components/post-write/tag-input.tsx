@@ -1,6 +1,6 @@
 import { useState, useRef } from "react";
-import { RiCloseLine, RiAddLine, RiCheckLine } from "@remixicon/react";
-import { Badge } from "@/components/ui/badge";
+import { RiAddLine, RiCheckLine } from "@remixicon/react";
+import { PostTag } from "@/components/post/post-tag";
 import { POST_TAG_MAX_LENGTH } from "@/features/post/lib/post-write-constraints";
 import { cn } from "@/lib/utils";
 
@@ -128,21 +128,11 @@ export function TagInput({ value, onChange, suggestions, maxTags = MAX_TAGS_DEFA
       {value.length > 0 ? (
         <div className="flex min-w-0 flex-wrap gap-2">
           {value.map((tag) => (
-            <Badge
+            <PostTag
               key={tag}
-              variant="secondary"
-              className="max-w-full min-w-0 gap-1 px-3 py-1 text-xs text-[#305CEC] dark:text-[#5B7FFF]"
-            >
-              <span className="min-w-0 truncate">{tag}</span>
-              <button
-                type="button"
-                onClick={() => removeTag(tag)}
-                className="flex shrink-0 items-center justify-center text-muted-foreground transition-colors hover:text-foreground"
-                aria-label={`${tag} 태그 삭제`}
-              >
-                <RiCloseLine size={14} />
-              </button>
-            </Badge>
+              tag={tag}
+              onRemove={() => removeTag(tag)}
+            />
           ))}
         </div>
       ) : null}
