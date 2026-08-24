@@ -5,16 +5,12 @@ const TOC_ITEM_WIDTHS = ["w-32", "w-24", "w-36", "w-28", "w-32"] as const;
 
 function PostDetailHeaderSkeleton(): React.ReactElement {
   return (
-    <header className="relative mb-14 animate-pulse pb-14">
+    <header className="animate-pulse pb-14">
       <div className="mx-auto h-9 w-3/4 max-w-xl rounded-md bg-muted" />
       <div className="mt-6 flex items-center justify-center gap-5">
         <div className="h-5 w-20 rounded bg-muted" />
         <div className="h-5 w-24 rounded bg-muted" />
       </div>
-      <span
-        aria-hidden="true"
-        className="absolute bottom-0 left-1/2 w-dvw -translate-x-1/2 border-b border-border"
-      />
     </header>
   );
 }
