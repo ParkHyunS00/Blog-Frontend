@@ -36,6 +36,14 @@ export function createPost(payload: PublishPostPayload): Promise<PostMutationRes
   return apiRequest("/api/admin/posts", { method: "POST", body: JSON.stringify(payload) }, postMutationResultSchema);
 }
 
+export function updatePublishedPost(postId: number, payload: PublishPostPayload): Promise<PostMutationResult> {
+  return apiRequest(`/api/admin/posts/${postId}`, { method: "PUT", body: JSON.stringify(payload) }, postMutationResultSchema);
+}
+
+export function deletePublishedPost(postId: number): Promise<null> {
+  return apiRequest(`/api/admin/posts/${postId}`, { method: "DELETE" }, z.null());
+}
+
 export function createDraft(payload: SaveDraftPayload): Promise<PostMutationResult> {
   return apiRequest("/api/admin/posts/draft", { method: "POST", body: JSON.stringify(payload) }, postMutationResultSchema);
 }

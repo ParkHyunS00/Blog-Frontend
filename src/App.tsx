@@ -41,8 +41,9 @@ function App() {
         ) : (
           <Routes>
             <Route path="/" element={<HomePage />} />
-            <Route path="/admin/posts/write" element={<PostWritePage />} />
-            <Route path="/admin/posts/draft/:postId/edit" element={<PostWritePage />} />
+            <Route path="/admin/posts/write" element={<PostWritePage modeType="CREATE" />} />
+            <Route path="/admin/posts/draft/:postId/edit" element={<PostWritePage modeType="EDIT_DRAFT" />} />
+            <Route path="/admin/posts/:postId/edit" element={<PostWritePage modeType="EDIT_PUBLISHED" />} />
             <Route path="/posts/:id" element={<PostDetailPage />} />
             <Route path="/admin" element={<AdminPage />} />
           </Routes>

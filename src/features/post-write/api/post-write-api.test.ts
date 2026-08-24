@@ -3,7 +3,9 @@ import test, { afterEach } from "node:test";
 import {
   createDraft,
   deleteDraft,
+  deletePublishedPost,
   fetchDraftList,
+  updatePublishedPost,
   uploadPostImage,
 } from "./post-write-api.ts";
 
@@ -77,4 +79,41 @@ test("임시저장 삭제는 DELETE 요청을 사용한다", async () => {
 
   await deleteDraft(15);
   assert.equal(method, "DELETE");
+});
+
+test("공개 게시글 수정은 전체 편집 상태를 PUT 요청으로 전송한다", async () => {
+  let request: Request | undefined;
+  globalThis.fetch = async (input, init) => {
+    request = new Request(new URL(String(input), "http://localhost"), init);
+    return jsonResponse({ postId: 15, status: "PUBLISHED" });
+  };
+  const payload = {
+    title: "수정 제목",
+    summary: "수정 요약",
+    content: '<p>본문</p><img src="/api/post-images/31">',
+    categoryName: "Backend",
+    tagNames: ["Java"],
+    thumbnailImageId: 30,
+    contentImageIds: [31],
+  };
+
+  await updatePublishedPost(15, payload);
+
+  assert.equal(request!.method, "PUT");
+  assert.equal(new URL(request!.url).pathname, "/api/admin/posts/15");
+  assert.deepEqual(await request!.json(), payload);
+});
+
+test("공개 게시글 삭제는 요청 본문 없이 DELETE 요청을 사용한다", async () => {
+  let request: Request | undefined;
+  globalThis.fetch = async (input, init) => {
+    request = new Request(new URL(String(input), "http://localhost"), init);
+    return jsonResponse(null);
+  };
+
+  await deletePublishedPost(15);
+
+  assert.equal(request!.method, "DELETE");
+  assert.equal(new URL(request!.url).pathname, "/api/admin/posts/15");
+  assert.equal(await request!.text(), "");
 });
