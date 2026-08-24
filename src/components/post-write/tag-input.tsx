@@ -1,8 +1,9 @@
 import { useState, useRef } from "react";
-import { RiCloseLine, RiAddLine, RiCheckLine } from "@remixicon/react";
-import { Badge } from "@/components/ui/badge";
+import { RiAddLine } from "@remixicon/react";
+import { PostTag } from "@/components/post/post-tag";
 import { POST_TAG_MAX_LENGTH } from "@/features/post/lib/post-write-constraints";
 import { cn } from "@/lib/utils";
+import { getAvailableTagSuggestions } from "./tag-input-options";
 
 type Props = {
   value: string[];
@@ -21,10 +22,7 @@ export function TagInput({ value, onChange, suggestions, maxTags = MAX_TAGS_DEFA
   const isMaxReached = value.length >= maxTags;
   // js-set-map-lookups: Set으로 O(1) 조회
   const valueSet = new Set(value);
-  const lowerInput = inputValue.toLowerCase();
-  const filteredSuggestions = suggestions.filter(
-    (s) => !valueSet.has(s) && s.toLowerCase().includes(lowerInput)
-  );
+  const filteredSuggestions = getAvailableTagSuggestions(suggestions, value, inputValue);
   const trimmedInput = inputValue.trim();
   const showNewTagOption = trimmedInput && !filteredSuggestions.includes(trimmedInput) && !valueSet.has(trimmedInput);
 
@@ -89,25 +87,27 @@ export function TagInput({ value, onChange, suggestions, maxTags = MAX_TAGS_DEFA
         </div>
 
         {/* 드롭다운 */}
-        {isFocused && inputValue && (filteredSuggestions.length > 0 || showNewTagOption) && (
+        {isFocused && !isMaxReached ? (
           <div className="absolute top-full z-20 mt-1 w-full overflow-hidden rounded-lg border border-border bg-background shadow-lg">
-            {filteredSuggestions.length > 0 && (
-              <div className="max-h-36 overflow-y-auto py-1">
+            {filteredSuggestions.length > 0 ? (
+              <div className="flex max-h-40 flex-wrap gap-2 overflow-y-auto p-3">
                 {filteredSuggestions.map((suggestion) => (
                   <button
                     key={suggestion}
                     type="button"
                     onMouseDown={(e) => e.preventDefault()}
                     onClick={() => addTag(suggestion)}
-                    className="flex w-full min-w-0 items-center gap-2 px-4 py-2 text-left text-sm transition-colors hover:bg-secondary"
+                    className="min-w-0 rounded-full transition-opacity hover:opacity-75 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                    aria-label={`${suggestion} 태그 선택`}
                   >
-                    <RiCheckLine size={14} className="shrink-0 text-muted-foreground" />
-                    <span className="min-w-0 truncate">{suggestion}</span>
+                    <PostTag tag={suggestion} />
                   </button>
                 ))}
               </div>
-            )}
-            {showNewTagOption && (
+            ) : !showNewTagOption ? (
+              <p className="px-4 py-3 text-sm text-muted-foreground">선택할 수 있는 태그가 없습니다.</p>
+            ) : null}
+            {showNewTagOption ? (
               <div className={cn(filteredSuggestions.length > 0 && "border-t border-border")}>
                 <button
                   type="button"
@@ -119,30 +119,20 @@ export function TagInput({ value, onChange, suggestions, maxTags = MAX_TAGS_DEFA
                   <span className="min-w-0 truncate">&quot;{inputValue.trim()}&quot; 태그 추가</span>
                 </button>
               </div>
-            )}
+            ) : null}
           </div>
-        )}
+        ) : null}
       </div>
 
       {/* rendering-conditional-render: 삼항 연산자 사용 */}
       {value.length > 0 ? (
         <div className="flex min-w-0 flex-wrap gap-2">
           {value.map((tag) => (
-            <Badge
+            <PostTag
               key={tag}
-              variant="secondary"
-              className="max-w-full min-w-0 gap-1 px-3 py-1 text-xs text-[#305CEC] dark:text-[#5B7FFF]"
-            >
-              <span className="min-w-0 truncate">{tag}</span>
-              <button
-                type="button"
-                onClick={() => removeTag(tag)}
-                className="flex shrink-0 items-center justify-center text-muted-foreground transition-colors hover:text-foreground"
-                aria-label={`${tag} 태그 삭제`}
-              >
-                <RiCloseLine size={14} />
-              </button>
-            </Badge>
+              tag={tag}
+              onRemove={() => removeTag(tag)}
+            />
           ))}
         </div>
       ) : null}

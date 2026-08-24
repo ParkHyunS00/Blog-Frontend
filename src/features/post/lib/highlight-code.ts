@@ -37,13 +37,14 @@ export function processCodeBlocks(html: string): string {
         .replace(/&amp;/g, "&")
         .replace(/&lt;/g, "<")
         .replace(/&gt;/g, ">")
-        .replace(/&quot;/g, '"');
+        .replace(/&quot;/g, '"')
+        .replace(/(?:&nbsp;|&#160;|&#xA0;)/gi, " ");
 
       let highlighted: string;
       try {
         highlighted = hljs.highlight(decoded, { language: lang }).value;
       } catch {
-        highlighted = code;
+        highlighted = code.replace(/(?:&nbsp;|&#160;|&#xA0;)/gi, " ");
       }
 
       const lines = highlighted.split("\n");

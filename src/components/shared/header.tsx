@@ -43,7 +43,7 @@ const SEARCH_BUTTON_CLASS =
   "absolute left-0 top-0 flex h-full w-9 items-center justify-center text-muted-foreground transition-colors hover:text-foreground";
 
 const WritePostLink = (
-  <Link to="/posts/write" className={ICON_BUTTON_CLASS} aria-label="게시글 작성">
+  <Link to="/admin/posts/write" className={ICON_BUTTON_CLASS} aria-label="게시글 작성">
     <RiQuillPenLine size={20} />
   </Link>
 );
@@ -246,7 +246,7 @@ export function Header(): React.ReactElement {
             </button>
             {isAuthenticated && (
               <Link
-                to="/posts/write"
+                to="/admin/posts/write"
                 onClick={handleMobileMenuClose}
                 className="flex h-10 flex-1 items-center justify-center gap-2 rounded-lg bg-secondary text-sm font-medium text-foreground/80 transition-colors hover:text-foreground"
               >

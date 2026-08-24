@@ -1,4 +1,4 @@
-import { Badge } from "@/components/ui/badge";
+import { PostTag } from "@/components/post/post-tag";
 
 type PostDetailTagsProps = {
   tags: string[];
@@ -8,15 +8,9 @@ export function PostDetailTags({ tags }: PostDetailTagsProps): React.ReactElemen
   if (tags.length === 0) return null;
 
   return (
-    <section className="mt-14 flex flex-wrap gap-3" aria-label="게시글 태그">
+    <section className="mt-40 flex flex-wrap gap-3 md:mt-56" aria-label="게시글 태그">
       {tags.map((tag) => (
-        <Badge
-          key={tag}
-          variant="secondary"
-          className="max-w-full min-w-0 px-4 py-2 text-sm text-[#305CEC] dark:text-[#5B7FFF]"
-        >
-          <span className="min-w-0 truncate">{tag}</span>
-        </Badge>
+        <PostTag key={tag} tag={tag} size="lg" />
       ))}
     </section>
   );

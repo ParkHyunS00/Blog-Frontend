@@ -41,7 +41,8 @@ function App() {
         ) : (
           <Routes>
             <Route path="/" element={<HomePage />} />
-            <Route path="/posts/write" element={<PostWritePage />} />
+            <Route path="/admin/posts/write" element={<PostWritePage />} />
+            <Route path="/admin/posts/draft/:postId/edit" element={<PostWritePage />} />
             <Route path="/posts/:id" element={<PostDetailPage />} />
             <Route path="/admin" element={<AdminPage />} />
           </Routes>

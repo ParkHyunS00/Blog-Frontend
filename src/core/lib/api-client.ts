@@ -1,9 +1,9 @@
 import { z, type ZodTypeAny } from "zod";
-import { getCsrfToken } from "@/core/lib/csrf";
-import { standardResponseSchema } from "@/core/lib/standard-response";
-import type { ApiError } from "@/core/types/api.types";
+import { getCsrfToken } from "./csrf.ts";
+import { standardResponseSchema } from "./standard-response.ts";
+import type { ApiError } from "../types/api.types.ts";
 
-export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? "";
+export const API_BASE_URL = import.meta.env?.VITE_API_BASE_URL ?? "";
 
 const MUTATING_METHODS = new Set(["POST", "PUT", "PATCH", "DELETE"]);
 
@@ -26,7 +26,8 @@ export async function apiRequest<T extends ZodTypeAny>(
   const method = (init.method ?? "GET").toUpperCase();
   const headers = new Headers(init.headers);
 
-  if (init.body && !headers.has("Content-Type")) {
+  const isFormData = typeof FormData !== "undefined" && init.body instanceof FormData;
+  if (init.body && !isFormData && !headers.has("Content-Type")) {
     headers.set("Content-Type", "application/json");
   }
 

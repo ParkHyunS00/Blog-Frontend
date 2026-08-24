@@ -5,13 +5,15 @@ import { cn } from "@/lib/utils";
 
 type Props = {
   editor: Editor;
+  onUploadImage: (file: File) => Promise<string>;
 };
 
-export function ImageButton({ editor }: Props): React.ReactElement {
+export function ImageButton({ editor, onUploadImage }: Props): React.ReactElement {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [showCaption, setShowCaption] = useState(false);
   const [captionValue, setCaptionValue] = useState("");
   const [imageSrc, setImageSrc] = useState("");
+  const [isUploading, setIsUploading] = useState(false);
   const [pos, setPos] = useState({ top: 0, left: 0 });
   const buttonRef = useRef<HTMLButtonElement>(null);
 
@@ -19,13 +21,13 @@ export function ImageButton({ editor }: Props): React.ReactElement {
     fileInputRef.current?.click();
   }
 
-  function handleFileChange(e: React.ChangeEvent<HTMLInputElement>): void {
+  async function handleFileChange(e: React.ChangeEvent<HTMLInputElement>): Promise<void> {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    const reader = new FileReader();
-    reader.onload = () => {
-      const src = reader.result as string;
+    setIsUploading(true);
+    try {
+      const src = await onUploadImage(file);
       setImageSrc(src);
       setCaptionValue("");
       if (buttonRef.current) {
@@ -33,8 +35,11 @@ export function ImageButton({ editor }: Props): React.ReactElement {
         setPos({ top: rect.bottom + 4, left: rect.left });
       }
       setShowCaption(true);
-    };
-    reader.readAsDataURL(file);
+    } catch {
+      // 상위 작성 페이지의 공통 토스트에서 서버 오류를 표시한다.
+    } finally {
+      setIsUploading(false);
+    }
     e.target.value = "";
   }
 
@@ -68,6 +73,7 @@ export function ImageButton({ editor }: Props): React.ReactElement {
         ref={buttonRef}
         type="button"
         onClick={handleClick}
+        disabled={isUploading}
         title="이미지"
         className={cn(
           "flex h-8 w-8 items-center justify-center rounded-md transition-colors",
