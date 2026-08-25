@@ -7,6 +7,7 @@ import type { Category } from "@/features/category/types/category.types";
 type PageLayoutProps = {
   children: React.ReactNode;
   categories: Category[];
+  contentId?: string;
   isCategoriesLoading: boolean;
   isCategoriesError: boolean;
   onCategoriesRetry: () => void;
@@ -16,6 +17,7 @@ type PageLayoutProps = {
 export function PageLayout({
   children,
   categories,
+  contentId,
   isCategoriesLoading,
   isCategoriesError,
   onCategoriesRetry,
@@ -24,7 +26,10 @@ export function PageLayout({
   const [isMobilePanelOpen, setIsMobilePanelOpen] = useState(false);
 
   return (
-    <main className="mx-auto flex w-full max-w-screen-2xl gap-1 px-4 py-8 md:gap-20">
+    <main
+      id={contentId}
+      className="mx-auto flex w-full max-w-screen-2xl scroll-mt-14 gap-1 px-4 py-8 md:gap-20"
+    >
       <CategorySidebar
         categories={categories}
         isLoading={isCategoriesLoading}
