@@ -1,5 +1,7 @@
 import { useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
+import { HomeHero } from "@/components/home/home-hero";
+import { HomePostsReveal } from "@/components/home/home-posts-reveal";
 import { PostList } from "@/components/post/post-list";
 import { PostListSkeleton } from "@/components/post/post-list-skeleton";
 import { PostPagination } from "@/components/post/post-pagination";
@@ -10,6 +12,8 @@ import { useCategoryList } from "@/features/category/hooks/queries/use-category-
 import { mapPostListItem } from "@/features/post/api/post-list";
 import { usePostList } from "@/features/post/hooks/queries/use-post-list";
 import { normalizePostPage } from "@/features/post/lib/normalize-post-page";
+import { getHomeUrlWithoutLegacyPostListHash } from "@/features/home/lib/home-location";
+import { shouldShowHomeHero } from "@/features/home/lib/should-show-home-hero";
 import {
   getSearchKeyword,
   getSelectedCategorySlug,
@@ -24,6 +28,7 @@ export function HomePage(): React.ReactElement {
   const searchKeyword = getSearchKeyword(searchParams);
   const rawPage = Number(searchParams.get("page"));
   const currentPage = Number.isInteger(rawPage) && rawPage > 0 ? rawPage : 1;
+  const showHero = shouldShowHomeHero(searchParams);
 
   const postListQuery = usePostList({
     category: selectedCategorySlug ?? undefined,
@@ -35,10 +40,21 @@ export function HomePage(): React.ReactElement {
 
   const posts =
     postListQuery.data?.content.map((item) => mapPostListItem(item, API_BASE_URL)) ?? [];
+  const latestPost = posts[0] ? { id: posts[0].id, title: posts[0].title } : null;
   const categories = categoryListQuery.data ? buildCategories(categoryListQuery.data) : [];
   const normalizedPage = postListQuery.data
     ? normalizePostPage(currentPage, postListQuery.data.totalPages)
     : currentPage;
+
+  useEffect(() => {
+    const cleanUrl = getHomeUrlWithoutLegacyPostListHash(
+      window.location.pathname,
+      window.location.search,
+      window.location.hash,
+    );
+
+    if (cleanUrl) window.history.replaceState(window.history.state, "", cleanUrl);
+  }, []);
 
   useEffect(() => {
     if (!postListQuery.isSuccess || normalizedPage === currentPage) return;
@@ -51,33 +67,46 @@ export function HomePage(): React.ReactElement {
   }
 
   return (
-    <PageLayout
-      categories={categories}
-      isCategoriesLoading={categoryListQuery.isPending}
-      isCategoriesError={categoryListQuery.isError}
-      onCategoriesRetry={() => void categoryListQuery.refetch()}
-    >
-      {postListQuery.isPending ? <PostListSkeleton /> : null}
-      {postListQuery.isError ? (
-        <p className="py-20 text-center text-muted-foreground">
-          게시글 목록을 불러오지 못했습니다.
-        </p>
+    <>
+      {showHero ? (
+        <>
+          <HomeHero
+            latestPost={latestPost}
+            isLatestPostLoading={postListQuery.isPending}
+            isLatestPostError={postListQuery.isError}
+          />
+          <HomePostsReveal />
+        </>
       ) : null}
-      {postListQuery.isSuccess && normalizedPage === currentPage && posts.length === 0 ? (
-        <p className="py-20 text-center text-muted-foreground">
-          {searchKeyword ? "검색 결과가 없습니다." : "게시글이 없습니다."}
-        </p>
-      ) : null}
-      {postListQuery.isSuccess && normalizedPage === currentPage && posts.length > 0 ? (
-        <PostList posts={posts} />
-      ) : null}
-      {postListQuery.isSuccess && normalizedPage === currentPage ? (
-        <PostPagination
-          currentPage={postListQuery.data.page + 1}
-          totalPages={postListQuery.data.totalPages}
-          onPageChange={handlePageChange}
-        />
-      ) : null}
-    </PageLayout>
+      <PageLayout
+        categories={categories}
+        contentId="post-list"
+        isCategoriesLoading={categoryListQuery.isPending}
+        isCategoriesError={categoryListQuery.isError}
+        onCategoriesRetry={() => void categoryListQuery.refetch()}
+      >
+        {postListQuery.isPending ? <PostListSkeleton /> : null}
+        {postListQuery.isError ? (
+          <p className="py-20 text-center text-muted-foreground">
+            게시글 목록을 불러오지 못했습니다.
+          </p>
+        ) : null}
+        {postListQuery.isSuccess && normalizedPage === currentPage && posts.length === 0 ? (
+          <p className="py-20 text-center text-muted-foreground">
+            {searchKeyword ? "검색 결과가 없습니다." : "게시글이 없습니다."}
+          </p>
+        ) : null}
+        {postListQuery.isSuccess && normalizedPage === currentPage && posts.length > 0 ? (
+          <PostList posts={posts} />
+        ) : null}
+        {postListQuery.isSuccess && normalizedPage === currentPage ? (
+          <PostPagination
+            currentPage={postListQuery.data.page + 1}
+            totalPages={postListQuery.data.totalPages}
+            onPageChange={handlePageChange}
+          />
+        ) : null}
+      </PageLayout>
+    </>
   );
 }

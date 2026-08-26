@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useLayoutEffect, useMemo } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { PostDetailLayout } from "@/components/post-detail/post-detail-layout";
 import { PostDetailHeader } from "@/components/post-detail/post-detail-header";
@@ -18,6 +18,7 @@ import { canManagePosts } from "@/features/admin-auth/lib/can-manage-posts";
 import { mapPostDetail } from "@/features/post/api/post-detail";
 import { usePostDetail } from "@/features/post/hooks/queries/use-post-detail";
 import { prepareTocContent } from "@/features/post/lib/prepare-toc-content";
+import { scrollPageToTop } from "@/features/post/lib/scroll-page-top";
 import { useActiveToc } from "@/features/post/hooks/use-active-toc";
 import { useDeletePublishedPostMutation } from "@/features/post-write/hooks/mutations/use-delete-published-post";
 
@@ -39,6 +40,10 @@ export function PostDetailPage(): React.ReactElement {
     [post?.content],
   );
   const { activeId, handleTocClick } = useActiveToc(preparedContent.items);
+
+  useLayoutEffect(() => {
+    scrollPageToTop(window);
+  }, [postId]);
 
   async function handleDelete(): Promise<void> {
     try {
