@@ -26,15 +26,24 @@ test("이미지 업로드는 multipart boundary를 브라우저에 맡긴다", a
   let request: Request | undefined;
   globalThis.fetch = async (input, init) => {
     request = new Request(new URL(String(input), "http://localhost"), init);
-    return jsonResponse({ imageId: 12, type: "CONTENT", objectKey: "key.png", mimeType: "image/png" }, 201);
+    return jsonResponse({
+      imageId: 12,
+      type: "CONTENT",
+      objectKey: "key.webp",
+      mimeType: "image/webp",
+      width: 1536,
+      height: 922,
+    }, 201);
   };
 
-  await uploadPostImage(new File(["image"], "image.png", { type: "image/png" }), "CONTENT");
+  const uploaded = await uploadPostImage(new File(["image"], "image.webp", { type: "image/webp" }), "CONTENT");
 
   assert.equal(new URL(request!.url).pathname, "/api/admin/post-images");
   assert.equal(new URL(request!.url).searchParams.get("type"), "CONTENT");
   assert.match(request!.headers.get("content-type") ?? "", /^multipart\/form-data; boundary=/);
   assert.ok(request!.body);
+  assert.equal(uploaded.width, 1536);
+  assert.equal(uploaded.height, 922);
 });
 
 test("임시저장 목록은 0 기반 페이지를 요청한다", async () => {
