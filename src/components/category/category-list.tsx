@@ -1,7 +1,10 @@
 import { useSearchParams } from "react-router-dom";
 import { CategoryItem } from "@/components/category/category-item";
-import { useCategoryStore } from "@/core/stores/use-category-store";
 import type { Category } from "@/features/category/types/category.types";
+import {
+  getSelectedCategorySlug,
+  searchParamsForCategory,
+} from "@/features/post/lib/post-list-search-params";
 
 type CategoryListProps = {
   categories: Category[];
@@ -12,15 +15,11 @@ export function CategoryList({
   categories,
   onSelect,
 }: CategoryListProps): React.ReactElement {
-  const [, setSearchParams] = useSearchParams();
-  const selectedCategory = useCategoryStore((state) => state.selectedCategory);
-  const setSelectedCategory = useCategoryStore(
-    (state) => state.setSelectedCategory,
-  );
+  const [searchParams, setSearchParams] = useSearchParams();
+  const selectedCategorySlug = getSelectedCategorySlug(searchParams);
 
-  function handleItemClick(name: string): void {
-    setSelectedCategory(name);
-    setSearchParams({});
+  function handleItemClick(slug: string | null): void {
+    setSearchParams(searchParamsForCategory(searchParams, slug));
     onSelect?.();
   }
 
@@ -37,8 +36,8 @@ export function CategoryList({
             name={category.name}
             count={category.count}
             variant={category.name === "ALL" ? "all" : "default"}
-            selected={selectedCategory === category.name}
-            onClick={() => handleItemClick(category.name)}
+            selected={selectedCategorySlug === category.slug}
+            onClick={() => handleItemClick(category.slug)}
           />
         ))}
       </nav>

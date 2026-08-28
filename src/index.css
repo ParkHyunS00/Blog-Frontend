@@ -1,7 +1,13 @@
-@import url("https://cdn.jsdelivr.net/gh/sun-typeface/SUIT@2/fonts/static/woff2/SUIT.css");
-
 @import "tailwindcss";
 @import "tw-animate-css";
+
+@font-face {
+  font-family: "SUIT";
+  src: url("/fonts/SUIT-Variable.woff2") format("woff2-variations");
+  font-style: normal;
+  font-weight: 400 700;
+  font-display: swap;
+}
 
 @custom-variant dark (&:is(.dark *));
 
@@ -120,13 +126,543 @@
 }
 
 @layer base {
-  html {
-    overflow-y: scroll;
-  }
   * {
     @apply border-border outline-ring/50;
   }
   body {
     @apply bg-background text-foreground;
   }
+}
+
+/* Post detail content styles */
+.post-content {
+  @apply text-base leading-relaxed text-foreground;
+}
+
+.post-content h1 {
+  @apply mt-16 mb-6 text-3xl font-bold;
+}
+
+.post-content h2 {
+  @apply mt-14 mb-6 text-2xl font-bold;
+}
+
+.post-content h3 {
+  @apply mt-8 mb-4 text-lg font-semibold;
+}
+
+.post-content h4 {
+  @apply mt-6 mb-3 text-base font-semibold;
+}
+
+.post-content h5 {
+  @apply mt-4 mb-2 text-sm font-semibold;
+}
+
+.post-content h6 {
+  @apply mt-4 mb-2 text-sm font-medium text-muted-foreground;
+}
+
+.post-content p {
+  @apply my-4 leading-relaxed;
+}
+
+.post-content p:empty,
+.post-content p:has(br:only-child) {
+  @apply my-0;
+  min-height: 1.75rem;
+}
+
+.post-content a {
+  @apply text-[#305CEC] underline underline-offset-2 dark:text-[#5B7FFF];
+}
+
+.post-content strong u {
+  @apply font-bold;
+  text-decoration: none;
+  background-image: linear-gradient(to top, #fde047 40%, transparent 40%);
+}
+
+.dark .post-content strong u {
+  background-image: linear-gradient(to top, rgba(253, 224, 71, 0.3) 40%, transparent 40%);
+}
+
+.post-content mark {
+  @apply px-0.5;
+}
+
+.post-content mark:not([style]):not([data-color]) {
+  @apply bg-yellow-200/80 dark:bg-yellow-300/30;
+}
+
+.post-content mark[data-color="#fde047"] {
+  background-color: #fde047;
+}
+
+.post-content mark[data-color="#86efac"] {
+  background-color: #86efac;
+}
+
+.post-content mark[data-color="#93c5fd"] {
+  background-color: #93c5fd;
+}
+
+.post-content mark[data-color="#fda4af"] {
+  background-color: #fda4af;
+}
+
+.post-content mark[data-color="#c4b5fd"] {
+  background-color: #c4b5fd;
+}
+
+.post-content mark[data-color="#fdba74"] {
+  background-color: #fdba74;
+}
+
+.dark .post-content mark:is([style], [data-color]) {
+  opacity: 0.5;
+}
+
+.post-content blockquote {
+  @apply my-8 border-l-4 border-muted-foreground/40 pl-4 text-[#ffa348];
+}
+
+.post-content blockquote h3 {
+  @apply mt-0 mb-0 text-lg font-semibold text-[#ffa348];
+}
+
+.post-content [data-type="callout"] {
+  @apply my-6 flex gap-3 rounded-lg bg-muted/60 p-4;
+}
+
+.post-content [data-type="callout"] .callout-emoji {
+  @apply flex-shrink-0 text-xl leading-relaxed;
+}
+
+.post-content [data-type="callout"] .callout-content {
+  @apply min-w-0 flex-1;
+}
+
+.post-content [data-type="callout"] .callout-content p {
+  @apply my-0;
+}
+
+.post-content ul {
+  @apply my-4 list-disc pl-6;
+}
+
+.post-content ul ul {
+  @apply my-1 list-[circle];
+}
+
+.post-content ul ul ul {
+  @apply list-[square];
+}
+
+.post-content ul ul ul ul {
+  @apply list-disc;
+}
+
+.post-content ol {
+  @apply my-4 list-decimal pl-6;
+}
+
+.post-content ol ol {
+  @apply my-1 list-[lower-alpha];
+}
+
+.post-content ol ol ol {
+  @apply list-[lower-roman];
+}
+
+.post-content ol ol ol ol {
+  @apply list-decimal;
+}
+
+.post-content li {
+  @apply my-1;
+}
+
+.post-content code {
+  @apply rounded bg-muted px-1.5 py-0.5 text-sm;
+}
+
+/* Code block wrapper */
+.code-block-wrapper {
+  @apply my-6 overflow-hidden rounded-xl;
+  background: #fafafa;
+}
+
+.dark .code-block-wrapper {
+  background: #2a2b2e;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.code-block-header {
+  @apply flex items-center gap-3 border-b border-black/5 px-4 py-3;
+  background: #f0f0f0;
+}
+
+.dark .code-block-header {
+  background: #242527;
+  border-color: rgba(255, 255, 255, 0.05);
+}
+
+.code-block-dots {
+  @apply flex items-center gap-2;
+}
+
+.code-block-dots .dot {
+  @apply block h-3 w-3 rounded-full;
+}
+
+.dot-red {
+  background: #ff5f57;
+}
+
+.dot-yellow {
+  background: #febc2e;
+}
+
+.dot-green {
+  background: #28c840;
+}
+
+.code-block-lang {
+  @apply flex-1 text-xs;
+  color: #999;
+}
+
+.dark .code-block-lang {
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.code-block-copy {
+  @apply ml-auto cursor-pointer rounded px-2 py-1 text-xs transition-colors;
+  color: #999;
+}
+
+.code-block-copy:hover {
+  color: #333;
+  background: rgba(0, 0, 0, 0.05);
+}
+
+.dark .code-block-copy {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.dark .code-block-copy:hover {
+  color: rgba(255, 255, 255, 0.8);
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.post-content .code-block-wrapper pre {
+  @apply m-0 flex gap-4 overflow-x-auto p-4;
+  background: transparent !important;
+}
+
+.code-block-lines {
+  @apply flex flex-col text-right text-sm leading-relaxed select-none;
+  color: #ccc;
+}
+
+.dark .code-block-lines {
+  color: rgba(255, 255, 255, 0.2);
+}
+
+.post-content pre code {
+  @apply block bg-transparent p-0 text-sm leading-relaxed;
+}
+
+.post-content pre code.hljs {
+  @apply bg-transparent p-0;
+}
+
+/* Syntax highlighting - Light mode */
+.hljs {
+  color: #383a42;
+}
+
+.hljs-keyword,
+.hljs-selector-tag,
+.hljs-built_in {
+  color: #a626a4;
+}
+
+.hljs-string,
+.hljs-attr {
+  color: #50a14f;
+}
+
+.hljs-number,
+.hljs-literal {
+  color: #986801;
+}
+
+.hljs-comment {
+  color: #a0a1a7;
+  font-style: italic;
+}
+
+.hljs-function .hljs-title,
+.hljs-title.function_ {
+  color: #4078f2;
+}
+
+.hljs-type,
+.hljs-title.class_ {
+  color: #c18401;
+}
+
+.hljs-variable,
+.hljs-template-variable {
+  color: #e45649;
+}
+
+.hljs-property {
+  color: #e45649;
+}
+
+.hljs-params {
+  color: #383a42;
+}
+
+.hljs-punctuation {
+  color: #383a42;
+}
+
+.hljs-meta {
+  color: #4078f2;
+}
+
+.hljs-operator {
+  color: #383a42;
+}
+
+/* Syntax highlighting - Dark mode */
+.dark .hljs {
+  color: #abb2bf;
+}
+
+.dark .hljs-keyword,
+.dark .hljs-selector-tag,
+.dark .hljs-built_in {
+  color: #c678dd;
+}
+
+.dark .hljs-string,
+.dark .hljs-attr {
+  color: #98c379;
+}
+
+.dark .hljs-number,
+.dark .hljs-literal {
+  color: #d19a66;
+}
+
+.dark .hljs-comment {
+  color: #5c6370;
+  font-style: italic;
+}
+
+.dark .hljs-function .hljs-title,
+.dark .hljs-title.function_ {
+  color: #61afef;
+}
+
+.dark .hljs-type,
+.dark .hljs-title.class_ {
+  color: #e5c07b;
+}
+
+.dark .hljs-variable,
+.dark .hljs-template-variable {
+  color: #e06c75;
+}
+
+.dark .hljs-property {
+  color: #e06c75;
+}
+
+.dark .hljs-params {
+  color: #abb2bf;
+}
+
+.dark .hljs-punctuation {
+  color: #abb2bf;
+}
+
+.dark .hljs-meta {
+  color: #61afef;
+}
+
+.dark .hljs-operator {
+  color: #abb2bf;
+}
+
+.post-content img {
+  @apply my-6 h-auto max-w-full rounded-lg;
+}
+
+.post-content figure.image-figure {
+  @apply my-6;
+}
+
+.post-content figure.image-figure img {
+  @apply mx-auto my-0;
+}
+
+.post-content figure.image-figure figcaption {
+  @apply mt-2 text-center text-sm leading-relaxed text-muted-foreground;
+}
+
+.post-content table {
+  @apply mx-auto my-6 w-full border-collapse;
+  table-layout: fixed;
+}
+
+.post-content th,
+.post-content td {
+  @apply border border-border px-3 py-1.5 text-center;
+  word-break: break-word;
+  overflow-wrap: break-word;
+}
+
+.post-content th {
+  @apply bg-muted font-semibold;
+}
+
+.post-content hr {
+  @apply my-8 border-border;
+}
+
+/* ==============================
+   Post Editor (tiptap) Styles
+   ============================== */
+
+/* Editor placeholder */
+.tiptap p.is-editor-empty:first-child::before {
+  content: attr(data-placeholder);
+  float: left;
+  height: 0;
+  pointer-events: none;
+  @apply text-muted-foreground/50;
+}
+
+/* Editor content area */
+.post-editor-content {
+  min-height: 100%;
+}
+
+.post-editor-content:focus {
+  outline: none;
+}
+
+/* Code block within editor */
+.post-editor-content pre {
+  @apply my-6 overflow-hidden rounded-xl p-0 font-mono text-sm;
+  background: #fafafa;
+}
+
+.dark .post-editor-content pre {
+  background: #2a2b2e;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.post-editor-content pre::before {
+  @apply block h-11 border-b border-black/5;
+  content: "";
+  background:
+    radial-gradient(circle at 18px 50%, #ff5f57 0 6px, transparent 6.5px),
+    radial-gradient(circle at 40px 50%, #febc2e 0 6px, transparent 6.5px),
+    radial-gradient(circle at 62px 50%, #28c840 0 6px, transparent 6.5px),
+    #f0f0f0;
+}
+
+.dark .post-editor-content pre::before {
+  border-color: rgba(255, 255, 255, 0.05);
+  background:
+    radial-gradient(circle at 18px 50%, #ff5f57 0 6px, transparent 6.5px),
+    radial-gradient(circle at 40px 50%, #febc2e 0 6px, transparent 6.5px),
+    radial-gradient(circle at 62px 50%, #28c840 0 6px, transparent 6.5px),
+    #242527;
+}
+
+.post-editor-content pre code {
+  @apply block overflow-x-auto bg-transparent p-4 text-sm leading-relaxed;
+}
+
+/* Image figure within editor */
+.post-editor-content figure.image-figure {
+  @apply my-6;
+}
+
+.post-editor-content figure.image-figure img {
+  @apply max-w-full rounded-lg;
+}
+
+.post-editor-content figure.image-figure figcaption {
+  @apply mt-2 text-center text-sm text-muted-foreground;
+}
+
+/* Table within editor */
+.post-editor-content .tableWrapper {
+  @apply my-6 overflow-x-auto;
+}
+
+.post-editor-content table {
+  @apply mx-auto w-full border-collapse;
+  table-layout: fixed;
+}
+
+.post-editor-content th,
+.post-editor-content td {
+  @apply relative border border-border px-3 py-1.5 text-center text-sm;
+  word-break: break-word;
+  overflow-wrap: break-word;
+}
+
+.post-editor-content th {
+  @apply bg-muted font-semibold;
+}
+
+.post-editor-content td {
+  @apply align-top;
+}
+
+.post-editor-content th p,
+.post-editor-content td p {
+  @apply my-0;
+}
+
+/* Selected table cells */
+.post-editor-content .selectedCell {
+  @apply bg-[#305CEC]/10 dark:bg-[#5B7FFF]/10;
+}
+
+.post-editor-content .selectedCell::after {
+  content: "";
+  @apply pointer-events-none absolute inset-0 border-2 border-[#305CEC] dark:border-[#5B7FFF];
+}
+
+/* Column resize handle */
+.post-editor-content .column-resize-handle {
+  @apply absolute top-0 right-[-2px] bottom-0 w-1 cursor-col-resize bg-[#305CEC] dark:bg-[#5B7FFF];
+}
+
+/* Callout within editor */
+.post-editor-content [data-type="callout"] {
+  @apply my-6 flex gap-3 rounded-lg bg-muted/60 p-4;
+}
+
+.post-editor-content [data-type="callout"] .callout-emoji {
+  @apply flex-shrink-0 text-xl leading-relaxed;
+}
+
+.post-editor-content [data-type="callout"] .callout-content {
+  @apply min-w-0 flex-1;
+}
+
+.post-editor-content [data-type="callout"] .callout-content p {
+  @apply my-0;
 }
