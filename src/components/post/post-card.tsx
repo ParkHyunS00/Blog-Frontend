@@ -1,5 +1,9 @@
 import { Link } from "react-router-dom";
 import { PostTag } from "@/components/post/post-tag";
+import {
+  THUMBNAIL_TARGET_HEIGHT,
+  THUMBNAIL_TARGET_WIDTH,
+} from "@/features/post/lib/post-write-constraints";
 import type { Post } from "@/features/post/types/post.types";
 
 type PostCardProps = {
@@ -45,7 +49,10 @@ export function PostCard({ post, isLast = false, priority = false }: PostCardPro
           <img
             src={post.thumbnailUrl}
             alt={post.title}
+            width={THUMBNAIL_TARGET_WIDTH}
+            height={THUMBNAIL_TARGET_HEIGHT}
             loading={priority ? "eager" : "lazy"}
+            decoding="async"
             fetchPriority={priority ? "high" : "auto"}
             className="h-[180px] w-full rounded-lg object-cover sm:h-[160px] sm:w-[230px]"
           />

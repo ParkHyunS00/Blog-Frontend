@@ -93,6 +93,8 @@ export function ThumbnailInput({ value, onChange, isUploading = false, uploadErr
           <img
             src={value.previewUrl}
             alt="선택한 썸네일 미리보기"
+            width={THUMBNAIL_TARGET_WIDTH}
+            height={THUMBNAIL_TARGET_HEIGHT}
             className="size-full object-cover transition-transform group-hover:scale-[1.02]"
           />
         ) : (

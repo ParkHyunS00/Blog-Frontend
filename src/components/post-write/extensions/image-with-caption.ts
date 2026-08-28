@@ -1,9 +1,15 @@
 import { Node, mergeAttributes } from "@tiptap/react";
+import type { EditorImageUpload } from "@/features/post-write/lib/editor-image-upload";
+
+type ImageWithCaptionAttributes = EditorImageUpload & {
+  alt?: string;
+  caption?: string;
+};
 
 declare module "@tiptap/react" {
   interface Commands<ReturnType> {
     imageWithCaption: {
-      setImageWithCaption: (attrs: { src: string; alt?: string; caption?: string }) => ReturnType;
+      setImageWithCaption: (attrs: ImageWithCaptionAttributes) => ReturnType;
     };
   }
 }
@@ -18,6 +24,8 @@ export const ImageWithCaption = Node.create({
       src: { default: null },
       alt: { default: null },
       caption: { default: null },
+      width: { default: null },
+      height: { default: null },
     };
   },
 
@@ -32,6 +40,8 @@ export const ImageWithCaption = Node.create({
             src: img?.getAttribute("src"),
             alt: img?.getAttribute("alt"),
             caption: figcaption?.textContent ?? null,
+            width: img?.getAttribute("width") ? Number(img.getAttribute("width")) : null,
+            height: img?.getAttribute("height") ? Number(img.getAttribute("height")) : null,
           };
         },
       },

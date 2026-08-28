@@ -28,6 +28,10 @@ import { usePostDetail } from "@/features/post/hooks/queries/use-post-detail";
 import { POST_TAG_MAX_LENGTH } from "@/features/post/lib/post-write-constraints";
 import { hasPostWriteContent } from "@/features/post/lib/post-write-form";
 import { getPostImageDisplayUrl } from "@/features/post/lib/post-image-url";
+import {
+  toEditorImageUpload,
+  type EditorImageUpload,
+} from "@/features/post-write/lib/editor-image-upload";
 import type { PostWriteForm } from "@/features/post/types/post-write.types";
 
 const PostEditor = lazy(() => import("@/components/post-write/post-editor").then((module) => ({ default: module.PostEditor })));
@@ -178,11 +182,11 @@ function PostWriteEditorPage({ mode, initialForm }: { mode: EditorMode; initialF
     }
   }
 
-  async function handleContentImageUpload(file: File): Promise<string> {
+  async function handleContentImageUpload(file: File): Promise<EditorImageUpload> {
     try {
       const uploaded = await uploadMutation.mutateAsync({ file, type: "CONTENT" });
       orphanImageIdsRef.current.add(uploaded.imageId);
-      return getPostImageDisplayUrl(uploaded.imageId, API_BASE_URL);
+      return toEditorImageUpload(uploaded, API_BASE_URL);
     } catch (error) {
       showErrorToast({ title: "본문 이미지 업로드 실패", error, fallback: "본문 이미지 업로드에 실패했습니다." });
       throw error;
