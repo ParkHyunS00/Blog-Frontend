@@ -12,6 +12,7 @@ import { PostDetailSkeleton } from "@/components/post-detail/post-detail-skeleto
 import { PostAdminActions } from "@/components/post-detail/post-admin-actions";
 import { ErrorPage } from "@/components/shared/error-page";
 import { ApiException } from "@/core/lib/api-client";
+import { useDocumentDescription } from "@/core/seo/use-document-description";
 import { useToast } from "@/core/toast/toast-context";
 import { useAuthStatus } from "@/features/admin-auth/hooks/queries/use-auth-status";
 import { canManagePosts } from "@/features/admin-auth/lib/can-manage-posts";
@@ -35,6 +36,7 @@ export function PostDetailPage(): React.ReactElement {
     () => (postDetailQuery.data ? mapPostDetail(postDetailQuery.data) : null),
     [postDetailQuery.data],
   );
+  useDocumentDescription(post?.summary);
   const preparedContent = useMemo(
     () => prepareTocContent(post?.content ?? ""),
     [post?.content],
