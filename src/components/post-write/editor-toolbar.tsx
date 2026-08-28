@@ -18,10 +18,11 @@ import { CodeBlockDropdown } from "@/components/post-write/toolbar/code-block-dr
 import { TableDropdown } from "@/components/post-write/toolbar/table-dropdown";
 import { LinkButton } from "@/components/post-write/toolbar/link-button";
 import { ImageButton } from "@/components/post-write/toolbar/image-button";
+import type { EditorImageUpload } from "@/features/post-write/lib/editor-image-upload";
 
 type Props = {
   editor: Editor;
-  onUploadImage: (file: File) => Promise<string>;
+  onUploadImage: (file: File) => Promise<EditorImageUpload>;
 };
 
 export function EditorToolbar({ editor, onUploadImage }: Props): React.ReactElement {

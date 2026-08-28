@@ -22,13 +22,14 @@ import {
   toPostImageDisplayHtml,
   toPostImageStorageHtml,
 } from "@/features/post/lib/post-image-url";
+import type { EditorImageUpload } from "@/features/post-write/lib/editor-image-upload";
 
 const lowlight = createLowlight(common);
 
 type Props = {
   content: string;
   onChange: (html: string) => void;
-  onUploadImage: (file: File) => Promise<string>;
+  onUploadImage: (file: File) => Promise<EditorImageUpload>;
   className?: string;
 };
 

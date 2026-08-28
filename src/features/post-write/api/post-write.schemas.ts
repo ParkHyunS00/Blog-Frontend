@@ -17,6 +17,8 @@ export const postImageUploadSchema = z.object({
   type: z.enum(["CONTENT", "THUMBNAIL"]),
   objectKey: z.string(),
   mimeType: z.string(),
+  width: z.number().int().positive(),
+  height: z.number().int().positive(),
 });
 
 export const postMutationResultSchema = z.object({

@@ -20,7 +20,7 @@ export function PostTag({
     <Badge
       variant="secondary"
       className={cn(
-        "max-w-full min-w-0 text-[#305CEC] dark:text-[#5B7FFF]",
+        "max-w-full min-w-0 text-[#305CEC] dark:text-[#7395FF]",
         getPostTagSizeClassName(size),
         onRemove && "gap-1",
         className,

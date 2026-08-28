@@ -2,17 +2,18 @@ import { useRef, useState } from "react";
 import { type Editor } from "@tiptap/react";
 import { RiImageAddLine, RiCheckLine } from "@remixicon/react";
 import { cn } from "@/lib/utils";
+import type { EditorImageUpload } from "@/features/post-write/lib/editor-image-upload";
 
 type Props = {
   editor: Editor;
-  onUploadImage: (file: File) => Promise<string>;
+  onUploadImage: (file: File) => Promise<EditorImageUpload>;
 };
 
 export function ImageButton({ editor, onUploadImage }: Props): React.ReactElement {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [showCaption, setShowCaption] = useState(false);
   const [captionValue, setCaptionValue] = useState("");
-  const [imageSrc, setImageSrc] = useState("");
+  const [uploadedImage, setUploadedImage] = useState<EditorImageUpload | null>(null);
   const [isUploading, setIsUploading] = useState(false);
   const [pos, setPos] = useState({ top: 0, left: 0 });
   const buttonRef = useRef<HTMLButtonElement>(null);
@@ -27,8 +28,8 @@ export function ImageButton({ editor, onUploadImage }: Props): React.ReactElemen
 
     setIsUploading(true);
     try {
-      const src = await onUploadImage(file);
-      setImageSrc(src);
+      const image = await onUploadImage(file);
+      setUploadedImage(image);
       setCaptionValue("");
       if (buttonRef.current) {
         const rect = buttonRef.current.getBoundingClientRect();
@@ -44,16 +45,18 @@ export function ImageButton({ editor, onUploadImage }: Props): React.ReactElemen
   }
 
   function handleInsert(): void {
-    editor.chain().focus().setImageWithCaption({ src: imageSrc, caption: captionValue }).run();
+    if (!uploadedImage) return;
+    editor.chain().focus().setImageWithCaption({ ...uploadedImage, caption: captionValue }).run();
     setShowCaption(false);
-    setImageSrc("");
+    setUploadedImage(null);
     setCaptionValue("");
   }
 
   function handleSkip(): void {
-    editor.chain().focus().setImageWithCaption({ src: imageSrc, caption: "" }).run();
+    if (!uploadedImage) return;
+    editor.chain().focus().setImageWithCaption({ ...uploadedImage, caption: "" }).run();
     setShowCaption(false);
-    setImageSrc("");
+    setUploadedImage(null);
     setCaptionValue("");
   }
 
