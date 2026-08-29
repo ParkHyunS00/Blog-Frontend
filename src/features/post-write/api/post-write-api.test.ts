@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
-import test, { afterEach } from "node:test";
+import test, { afterEach, beforeEach } from "node:test";
+import * as csrfModule from "../../../core/lib/csrf.ts";
 import {
   createDraft,
   deleteDraft,
@@ -11,8 +12,16 @@ import {
 
 const originalFetch = globalThis.fetch;
 
+beforeEach(() => {
+  const csrf = csrfModule as typeof csrfModule & {
+    setCsrfToken?: (value: { token: string; headerName: string }) => void;
+  };
+  csrf.setCsrfToken?.({ token: "test-csrf-token", headerName: "X-XSRF-TOKEN" });
+});
+
 afterEach(() => {
   globalThis.fetch = originalFetch;
+  (csrfModule as typeof csrfModule & { clearCsrfToken?: () => void }).clearCsrfToken?.();
 });
 
 function jsonResponse(data: unknown, status = 200): Response {
