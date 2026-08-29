@@ -7,10 +7,11 @@ import { authStatusQueryOptions } from "@/features/admin-auth/hooks/queries/use-
 export function useOtpMutation() {
   const queryClient = useQueryClient();
   return useMutation({
+    meta: { handlesAuthErrorLocally: true },
     mutationFn: postOtp,
     onSuccess: async () => {
       await Promise.all([
-        queryClient.invalidateQueries(csrfQueryOptions),
+        queryClient.fetchQuery(csrfQueryOptions),
         queryClient.invalidateQueries(authStatusQueryOptions),
       ]);
     },

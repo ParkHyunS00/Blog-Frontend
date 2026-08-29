@@ -6,6 +6,7 @@ import {
 } from "@tanstack/react-query";
 import { useState } from "react";
 import { ApiException } from "@/core/lib/api-client";
+import { resolveApiErrorAction } from "@/core/lib/api-error-policy";
 import { authStatusQueryOptions } from "@/features/admin-auth/hooks/queries/use-auth-status";
 import { useApiErrorStore } from "@/core/stores/use-api-error-store";
 import { ToastProvider } from "@/components/ui/toast-provider";
@@ -25,31 +26,24 @@ function createQueryClient(): QueryClient {
   function handleApiError(
     error: unknown,
     failingQueryKey?: readonly unknown[],
+    handlesAuthErrorLocally = false,
   ): void {
     if (!(error instanceof ApiException)) return;
-    const { status } = error;
     const isAuthStatusFailure = !!failingQueryKey && isAuthStatusQueryKey(failingQueryKey);
+    const action = resolveApiErrorAction(error.status, {
+      isAuthStatusFailure,
+      handlesAuthErrorLocally,
+    });
 
-    if (status === 401 || status === 403) {
-      if (!isAuthStatusFailure) {
-        ref.client?.invalidateQueries(authStatusQueryOptions);
-      }
+    if (action.invalidateAuthStatus) {
+      ref.client?.invalidateQueries(authStatusQueryOptions);
     }
 
-    if (status === 401) {
-      if (isAuthStatusFailure) return;
+    if (action.redirectToLogin) {
       useApiErrorStore.getState().setShouldRedirectToLogin();
-      return;
     }
 
-    if (status === 403) {
-      useApiErrorStore.getState().setErrorKind("FORBIDDEN");
-      return;
-    }
-
-    if (status === 404) {
-      useApiErrorStore.getState().setErrorKind("NOT_FOUND");
-    }
+    if (action.errorKind) useApiErrorStore.getState().setErrorKind(action.errorKind);
   }
 
   const client = new QueryClient({
@@ -57,7 +51,12 @@ function createQueryClient(): QueryClient {
       onError: (error, query) => handleApiError(error, query.queryKey),
     }),
     mutationCache: new MutationCache({
-      onError: (error) => handleApiError(error),
+      onError: (error, _variables, _onMutateResult, mutation) =>
+        handleApiError(
+          error,
+          undefined,
+          mutation.meta?.handlesAuthErrorLocally === true,
+        ),
     }),
   });
 

@@ -1,7 +1,7 @@
 // src/features/admin-auth/api/fetch-csrf.ts
-import { z } from "zod";
-import { apiRequest } from "@/core/lib/api-client";
+import { refreshCsrfTokenFromServer } from "@/core/lib/api-client";
+import type { CsrfToken } from "@/core/lib/csrf";
 
-export async function fetchCsrf(): Promise<null> {
-  return apiRequest("/api/admin/csrf", { method: "GET" }, z.null());
+export async function fetchCsrf(): Promise<CsrfToken> {
+  return refreshCsrfTokenFromServer();
 }
