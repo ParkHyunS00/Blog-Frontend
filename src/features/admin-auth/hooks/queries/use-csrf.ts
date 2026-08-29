@@ -8,6 +8,8 @@ export const csrfQueryOptions = queryOptions({
   staleTime: 0,
   gcTime: 0,
   retry: false,
+  refetchOnWindowFocus: false,
+  refetchOnReconnect: false,
 });
 
 export function useCsrf() {
