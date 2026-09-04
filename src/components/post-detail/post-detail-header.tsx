@@ -21,7 +21,11 @@ export function PostDetailHeader({
       <h1 className="text-center text-2xl font-bold leading-tight md:text-3xl">
         {title}
       </h1>
-      <div className="mt-6 flex flex-wrap items-center justify-center gap-x-5 gap-y-2 text-sm text-muted-foreground">
+      <div
+        aria-label="게시글 정보"
+        className="mt-6 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-sm text-muted-foreground"
+        role="group"
+      >
         <span className="inline-flex items-center gap-1.5">
           <Eye aria-hidden="true" className="size-4" strokeWidth={1.8} />
           <span className="sr-only">조회수</span>

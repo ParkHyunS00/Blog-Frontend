@@ -7,8 +7,8 @@ function PostDetailHeaderSkeleton(): React.ReactElement {
   return (
     <header className="animate-pulse pb-14">
       <div className="mx-auto h-9 w-3/4 max-w-xl rounded-md bg-muted" />
-      <div className="mt-6 flex flex-wrap items-center justify-center gap-x-5 gap-y-2">
-        <div className="h-5 w-20 rounded bg-muted" />
+      <div className="mt-6 flex flex-wrap items-center justify-center gap-x-6 gap-y-2">
+        <div className="h-5 w-16 rounded bg-muted" />
         <div className="h-5 w-20 rounded bg-muted" />
         <div className="h-5 w-24 rounded bg-muted" />
       </div>
