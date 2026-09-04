@@ -3,7 +3,9 @@ import type { PostDetail } from "@/features/post/types/post.types";
 export const mockPostDetail: PostDetail = {
   id: 1,
   title: "ghostty 터미널을 3개월 사용해본 솔직 후기",
-  summary: "Ghostty를 3개월간 실무에서 사용하며 느낀 장단점과 설정 경험을 정리합니다.",
+  summary:
+    "Ghostty를 3개월간 실무에서 사용하며 느낀 장단점과 설정 경험을 정리합니다.",
+  viewCount: 128,
   category: "DX",
   createdAt: "2026.02.01 18:25",
   tags: ["Ghostty", "Terminal", "DX"],
