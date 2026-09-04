@@ -50,7 +50,10 @@ export function PostDetailPage(): React.ReactElement {
   async function handleDelete(): Promise<void> {
     try {
       await deleteMutation.mutateAsync();
-      showSuccessToast({ title: "게시글 삭제 완료", description: "게시글이 정상적으로 삭제되었습니다." });
+      showSuccessToast({
+        title: "게시글 삭제 완료",
+        description: "게시글이 정상적으로 삭제되었습니다.",
+      });
       navigate("/");
     } catch (error) {
       const fallback = "게시글 삭제에 실패했습니다.";
@@ -66,7 +69,10 @@ export function PostDetailPage(): React.ReactElement {
   }
 
   if (postDetailQuery.isError) {
-    if (postDetailQuery.error instanceof ApiException && postDetailQuery.error.status === 404) {
+    if (
+      postDetailQuery.error instanceof ApiException &&
+      postDetailQuery.error.status === 404
+    ) {
       return <ErrorPage kind="NOT_FOUND" />;
     }
 
@@ -86,6 +92,7 @@ export function PostDetailPage(): React.ReactElement {
           title={post.title}
           category={post.category}
           createdAt={post.createdAt}
+          viewCount={post.viewCount}
           actions={
             canManagePosts(authStatusQuery.data) ? (
               <PostAdminActions

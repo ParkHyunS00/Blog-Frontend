@@ -7,7 +7,8 @@ function PostDetailHeaderSkeleton(): React.ReactElement {
   return (
     <header className="animate-pulse pb-14">
       <div className="mx-auto h-9 w-3/4 max-w-xl rounded-md bg-muted" />
-      <div className="mt-6 flex items-center justify-center gap-5">
+      <div className="mt-6 flex flex-wrap items-center justify-center gap-x-5 gap-y-2">
+        <div className="h-5 w-20 rounded bg-muted" />
         <div className="h-5 w-20 rounded bg-muted" />
         <div className="h-5 w-24 rounded bg-muted" />
       </div>
@@ -21,7 +22,10 @@ function PostDetailTocSkeleton(): React.ReactElement {
       <div className="sticky top-40 w-48 animate-pulse border-l-2 border-border pl-4">
         <div className="space-y-4">
           {TOC_ITEM_WIDTHS.map((width, index) => (
-            <div key={`${width}-${index}`} className={`h-4 rounded bg-muted ${width}`} />
+            <div
+              key={`${width}-${index}`}
+              className={`h-4 rounded bg-muted ${width}`}
+            />
           ))}
         </div>
       </div>
@@ -39,14 +43,20 @@ function PostDetailBodySkeleton(): React.ReactElement {
 
       <div className="space-y-4">
         {BODY_LINE_WIDTHS.map((width, index) => (
-          <div key={`${width}-${index}`} className={`h-5 rounded bg-muted ${width}`} />
+          <div
+            key={`${width}-${index}`}
+            className={`h-5 rounded bg-muted ${width}`}
+          />
         ))}
       </div>
 
       <div className="mt-14 h-8 w-2/5 rounded-md bg-muted" />
       <div className="mt-7 space-y-4">
         {BODY_LINE_WIDTHS.map((width, index) => (
-          <div key={`second-${width}-${index}`} className={`h-5 rounded bg-muted ${width}`} />
+          <div
+            key={`second-${width}-${index}`}
+            className={`h-5 rounded bg-muted ${width}`}
+          />
         ))}
       </div>
 
