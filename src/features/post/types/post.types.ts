@@ -18,6 +18,7 @@ export interface PostDetail {
   id: number;
   title: string;
   summary: string;
+  viewCount: number;
   category: string;
   createdAt: string;
   content: string;

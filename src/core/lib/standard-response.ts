@@ -7,7 +7,7 @@ const apiErrorSchema = z.object({
   detailErrors: z.unknown().nullable(),
 });
 
-export function standardResponseSchema<T extends z.ZodTypeAny>(dataSchema: T) {
+export function standardResponseSchema<T extends z.ZodType>(dataSchema: T) {
   return z.object({
     status: z.number(),
     data: dataSchema.nullable(),
