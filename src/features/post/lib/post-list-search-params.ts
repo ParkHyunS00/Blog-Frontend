@@ -6,10 +6,15 @@ export function getSearchKeyword(searchParams: URLSearchParams): string | null {
   return searchParams.get("keyword")?.trim() || null;
 }
 
-export function searchParamsForKeyword(
-  currentSearchParams: URLSearchParams,
-  keyword: string,
-): URLSearchParams {
+export function getSelectedTagSlugs(searchParams: URLSearchParams): string[] {
+  const tags = searchParams
+    .getAll("tags")
+    .map((tag) => tag.trim())
+    .filter(Boolean);
+  return [...new Set(tags)];
+}
+
+export function searchParamsForKeyword(currentSearchParams: URLSearchParams, keyword: string): URLSearchParams {
   const nextSearchParams = new URLSearchParams(currentSearchParams);
   const normalizedKeyword = keyword.trim();
 
@@ -43,10 +48,7 @@ export function searchParamsForCategory(
   return nextSearchParams;
 }
 
-export function searchParamsForPage(
-  currentSearchParams: URLSearchParams,
-  page: number,
-): URLSearchParams {
+export function searchParamsForPage(currentSearchParams: URLSearchParams, page: number): URLSearchParams {
   const nextSearchParams = new URLSearchParams(currentSearchParams);
 
   if (page === 1) {
