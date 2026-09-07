@@ -26,6 +26,11 @@ const AdminPage = lazy(() =>
     default: module.AdminPage,
   })),
 );
+const AboutPage = lazy(() =>
+  import("@/routes/about/index").then((module) => ({
+    default: module.AboutPage,
+  })),
+);
 
 function RouteLoadingFallback(): React.ReactElement {
   return <div className="min-h-[calc(100vh-3.5rem)]" role="status" aria-label="페이지를 불러오는 중" />;
@@ -64,6 +69,7 @@ function App() {
           <Suspense fallback={<RouteLoadingFallback />}>
             <Routes>
               <Route path="/" element={<HomePage />} />
+              <Route path="/about" element={<AboutPage />} />
               <Route path="/admin/posts/write" element={<PostWritePage modeType="CREATE" />} />
               <Route path="/admin/posts/draft/:postId/edit" element={<PostWritePage modeType="EDIT_DRAFT" />} />
               <Route path="/admin/posts/:postId/edit" element={<PostWritePage modeType="EDIT_PUBLISHED" />} />
