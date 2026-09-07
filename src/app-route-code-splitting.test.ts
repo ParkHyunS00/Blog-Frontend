@@ -3,6 +3,7 @@ import { readFile } from "node:fs/promises";
 import test from "node:test";
 
 const LAZY_ROUTE_MODULES = [
+  "@/routes/posts/index",
   "@/routes/posts/[id]",
   "@/routes/posts/write",
   "@/routes/admin/index",
