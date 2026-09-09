@@ -12,6 +12,7 @@ export const postDetailResponseSchema = z.object({
   title: z.string(),
   summary: z.string(),
   content: z.string(),
+  viewCount: z.number().int().nonnegative(),
   thumbnailImageId: z.number().int().positive().nullable(),
   categoryName: z.string(),
   categorySlug: z.string(),
@@ -23,11 +24,16 @@ export const postDetailResponseSchema = z.object({
 
 export type PostDetailResponse = z.infer<typeof postDetailResponseSchema>;
 
+export function formatPostViewCount(viewCount: number): string {
+  return viewCount.toLocaleString("ko-KR");
+}
+
 export function mapPostDetail(post: PostDetailResponse): PostDetail {
   return {
     id: post.postId,
     title: post.title,
     summary: post.summary,
+    viewCount: post.viewCount,
     category: post.categoryName,
     createdAt: post.createdAt.slice(0, 10).replaceAll("-", "."),
     content: post.content,

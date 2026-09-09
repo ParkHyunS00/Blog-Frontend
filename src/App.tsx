@@ -6,24 +6,34 @@ import { ErrorPage } from "@/components/shared/error-page";
 import { useApiErrorStore } from "@/core/stores/use-api-error-store";
 import { HomePage } from "@/routes/index";
 
+const PostsPage = lazy(() =>
+  import("@/routes/posts/index").then((module) => ({
+    default: module.PostsPage,
+  })),
+);
 const PostDetailPage = lazy(() =>
-  import("@/routes/posts/[id]").then((module) => ({ default: module.PostDetailPage })),
+  import("@/routes/posts/[id]").then((module) => ({
+    default: module.PostDetailPage,
+  })),
 );
 const PostWritePage = lazy(() =>
-  import("@/routes/posts/write").then((module) => ({ default: module.PostWritePage })),
+  import("@/routes/posts/write").then((module) => ({
+    default: module.PostWritePage,
+  })),
 );
 const AdminPage = lazy(() =>
-  import("@/routes/admin/index").then((module) => ({ default: module.AdminPage })),
+  import("@/routes/admin/index").then((module) => ({
+    default: module.AdminPage,
+  })),
+);
+const AboutPage = lazy(() =>
+  import("@/routes/about/index").then((module) => ({
+    default: module.AboutPage,
+  })),
 );
 
 function RouteLoadingFallback(): React.ReactElement {
-  return (
-    <div
-      className="min-h-[calc(100vh-3.5rem)]"
-      role="status"
-      aria-label="페이지를 불러오는 중"
-    />
-  );
+  return <div className="min-h-[calc(100vh-3.5rem)]" role="status" aria-label="페이지를 불러오는 중" />;
 }
 
 function ApiErrorBridge(): null {
@@ -59,9 +69,11 @@ function App() {
           <Suspense fallback={<RouteLoadingFallback />}>
             <Routes>
               <Route path="/" element={<HomePage />} />
+              <Route path="/about" element={<AboutPage />} />
               <Route path="/admin/posts/write" element={<PostWritePage modeType="CREATE" />} />
               <Route path="/admin/posts/draft/:postId/edit" element={<PostWritePage modeType="EDIT_DRAFT" />} />
               <Route path="/admin/posts/:postId/edit" element={<PostWritePage modeType="EDIT_PUBLISHED" />} />
+              <Route path="/posts" element={<PostsPage />} />
               <Route path="/posts/:id" element={<PostDetailPage />} />
               <Route path="/admin" element={<AdminPage />} />
             </Routes>

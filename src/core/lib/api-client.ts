@@ -1,9 +1,5 @@
-import { z, type ZodTypeAny } from "zod";
-import {
-  ensureCsrfToken,
-  refreshCsrfToken,
-  type CsrfToken,
-} from "./csrf.ts";
+import { z, type ZodType } from "zod";
+import { ensureCsrfToken, refreshCsrfToken, type CsrfToken } from "./csrf.ts";
 import { standardResponseSchema } from "./standard-response.ts";
 import type { ApiError } from "../types/api.types.ts";
 
@@ -26,7 +22,7 @@ export class ApiException extends Error {
   }
 }
 
-async function executeApiRequest<T extends ZodTypeAny>(
+async function executeApiRequest<T extends ZodType>(
   path: string,
   init: RequestInit,
   dataSchema: T,
@@ -58,11 +54,19 @@ async function executeApiRequest<T extends ZodTypeAny>(
   const parsed = standardResponseSchema(dataSchema).safeParse(json);
 
   if (!parsed.success) {
-    console.error("API 응답 검증 실패", { path, json, issues: parsed.error.issues });
+    console.error("API 응답 검증 실패", {
+      path,
+      json,
+      issues: parsed.error.issues,
+    });
     throw new Error("API 응답 형식이 올바르지 않습니다.");
   }
 
-  const result = parsed.data as { status: number; data: z.infer<T>; error: ApiError | null };
+  const result = parsed.data as {
+    status: number;
+    data: z.infer<T>;
+    error: ApiError | null;
+  };
 
   if (result.error !== null) {
     throw new ApiException(result.status, result.error);
@@ -89,7 +93,7 @@ export function refreshCsrfTokenFromServer(): Promise<CsrfToken> {
   return refreshCsrfToken(requestCsrfToken);
 }
 
-export async function apiRequest<T extends ZodTypeAny>(
+export async function apiRequest<T extends ZodType>(
   path: string,
   init: RequestInit,
   dataSchema: T,
@@ -97,7 +101,8 @@ export async function apiRequest<T extends ZodTypeAny>(
   const method = (init.method ?? "GET").toUpperCase();
   const headers = new Headers(init.headers);
 
-  const isFormData = typeof FormData !== "undefined" && init.body instanceof FormData;
+  const isFormData =
+    typeof FormData !== "undefined" && init.body instanceof FormData;
   if (init.body && !isFormData && !headers.has("Content-Type")) {
     headers.set("Content-Type", "application/json");
   }

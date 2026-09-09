@@ -1,9 +1,13 @@
-import { apiRequest } from "@/core/lib/api-client";
+import { apiRequest } from "../../../core/lib/api-client.ts";
 import {
   postDetailResponseSchema,
   type PostDetailResponse,
-} from "@/features/post/api/post-detail";
+} from "./post-detail.ts";
 
 export function fetchPostDetail(postId: number): Promise<PostDetailResponse> {
-  return apiRequest(`/api/posts/${postId}`, { method: "GET" }, postDetailResponseSchema);
+  return apiRequest(
+    `/api/posts/${postId}`,
+    { method: "GET" },
+    postDetailResponseSchema,
+  );
 }

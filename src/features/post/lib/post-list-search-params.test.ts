@@ -2,26 +2,27 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import {
   getSelectedCategorySlug,
+  getSelectedTagSlugs,
   getSearchKeyword,
   searchParamsForCategory,
   searchParamsForKeyword,
   searchParamsForPage,
 } from "./post-list-search-params.ts";
 
+test("URL의 중복되거나 빈 태그를 정리해 선택된 태그 목록을 만든다", () => {
+  const tags = getSelectedTagSlugs(new URLSearchParams("tags=java&tags=&tags=spring-boot&tags=java"));
+
+  assert.deepEqual(tags, ["java", "spring-boot"]);
+});
+
 test("카테고리를 선택하면 category를 설정하고 기존 page를 제거한다", () => {
-  const params = searchParamsForCategory(
-    new URLSearchParams("category=devops&keyword=spring&page=3"),
-    "backend",
-  );
+  const params = searchParamsForCategory(new URLSearchParams("category=devops&keyword=spring&page=3"), "backend");
 
   assert.equal(params.toString(), "category=backend");
 });
 
 test("ALL을 선택하면 category와 page를 모두 제거한다", () => {
-  const params = searchParamsForCategory(
-    new URLSearchParams("category=backend&keyword=spring&page=2"),
-    null,
-  );
+  const params = searchParamsForCategory(new URLSearchParams("category=backend&keyword=spring&page=2"), null);
 
   assert.equal(params.toString(), "");
 });
@@ -43,10 +44,7 @@ test("URL에서 빈 category는 전체 목록으로 해석한다", () => {
 });
 
 test("검색어를 제출하면 공백을 정리하고 기존 필터와 페이지를 제거한다", () => {
-  const params = searchParamsForKeyword(
-    new URLSearchParams("category=backend&tags=java&page=3"),
-    "  스프링 보안  ",
-  );
+  const params = searchParamsForKeyword(new URLSearchParams("category=backend&tags=java&page=3"), "  스프링 보안  ");
 
   assert.equal(params.toString(), "keyword=%EC%8A%A4%ED%94%84%EB%A7%81+%EB%B3%B4%EC%95%88");
 });

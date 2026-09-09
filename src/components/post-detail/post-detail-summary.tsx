@@ -6,11 +6,20 @@ export function PostDetailSummary({ summary }: PostDetailSummaryProps): React.Re
   if (!summary.trim()) return null;
 
   return (
-    <aside
-      aria-label="게시글 요약"
-      className="mb-28 rounded-xl border-l-4 border-l-[#305CEC] bg-secondary/60 px-5 py-4 dark:border-l-[#5B7FFF] dark:bg-secondary/40 sm:px-6 sm:py-5"
-    >
-      <p className="text-base leading-relaxed text-muted-foreground md:text-lg">{summary}</p>
-    </aside>
+    <blockquote aria-label="게시글 요약" className="relative mx-auto mb-28 w-fit max-w-full px-8 py-5 sm:px-10">
+      <span
+        aria-hidden="true"
+        className="pointer-events-none absolute top-0 left-0 select-none font-serif text-5xl leading-none text-muted-foreground/60"
+      >
+        “
+      </span>
+      <p className="break-words text-base leading-7 text-muted-foreground italic md:text-lg md:leading-8">{summary}</p>
+      <span
+        aria-hidden="true"
+        className="pointer-events-none absolute right-0 -bottom-3 select-none font-serif text-5xl leading-none text-muted-foreground/60"
+      >
+        ”
+      </span>
+    </blockquote>
   );
 }
