@@ -12,6 +12,7 @@ type PageLayoutProps = {
   isCategoriesError: boolean;
   onCategoriesRetry: () => void;
   rightSidebar?: React.ReactNode;
+  categorySidebarFooter?: React.ReactNode;
 };
 
 export function PageLayout({
@@ -22,15 +23,14 @@ export function PageLayout({
   isCategoriesError,
   onCategoriesRetry,
   rightSidebar,
+  categorySidebarFooter,
 }: PageLayoutProps): React.ReactElement {
   const [isMobilePanelOpen, setIsMobilePanelOpen] = useState(false);
 
   return (
-    <main
-      id={contentId}
-      className="mx-auto flex w-full max-w-screen-2xl scroll-mt-14 gap-1 px-4 py-8 md:gap-20"
-    >
+    <main id={contentId} className="mx-auto flex w-full max-w-screen-2xl scroll-mt-14 gap-1 px-4 py-8 md:gap-20">
       <CategorySidebar
+        footer={categorySidebarFooter}
         categories={categories}
         isLoading={isCategoriesLoading}
         isError={isCategoriesError}
@@ -44,6 +44,7 @@ export function PageLayout({
       <CategoryFloatingButton onClick={() => setIsMobilePanelOpen(true)} />
       {isMobilePanelOpen && (
         <CategoryMobilePanel
+          footer={categorySidebarFooter}
           categories={categories}
           isLoading={isCategoriesLoading}
           isError={isCategoriesError}

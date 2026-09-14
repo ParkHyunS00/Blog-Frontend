@@ -4,6 +4,7 @@ import { CategoryListSkeleton } from "@/components/category/category-list-skelet
 import type { Category } from "@/features/category/types/category.types";
 
 type CategoryMobilePanelProps = {
+  footer?: React.ReactNode;
   categories: Category[];
   isLoading: boolean;
   isError: boolean;
@@ -12,6 +13,7 @@ type CategoryMobilePanelProps = {
 };
 
 export function CategoryMobilePanel({
+  footer,
   categories,
   isLoading,
   isError,
@@ -28,7 +30,7 @@ export function CategoryMobilePanel({
   return (
     <div className="fixed inset-0 z-50 md:hidden">
       <div className="absolute inset-0 bg-black/40" onClick={onClose} />
-      <div className="absolute bottom-0 left-0 top-0 w-64 bg-background p-5 shadow-xl">
+      <div className="absolute bottom-0 left-0 top-0 w-64 overflow-y-auto bg-background p-5 shadow-xl">
         {isLoading ? <CategoryListSkeleton /> : null}
         {isError ? (
           <div className="px-2 text-center text-sm text-muted-foreground">
@@ -38,9 +40,8 @@ export function CategoryMobilePanel({
             </button>
           </div>
         ) : null}
-        {!isLoading && !isError ? (
-          <CategoryList categories={categories} onSelect={onClose} />
-        ) : null}
+        {!isLoading && !isError ? <CategoryList categories={categories} onSelect={onClose} /> : null}
+        {footer}
       </div>
     </div>
   );
