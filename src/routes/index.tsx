@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import { HomeHero } from "@/components/home/home-hero";
 import { HomePostsReveal } from "@/components/home/home-posts-reveal";
+import { VisitorStats } from "@/components/home/visitor-stats";
 import { PostList } from "@/components/post/post-list";
 import { PostListSkeleton } from "@/components/post/post-list-skeleton";
 import { PostPagination } from "@/components/post/post-pagination";
@@ -102,6 +103,7 @@ export function HomePage(): React.ReactElement {
         </>
       ) : null}
       <PageLayout
+        categorySidebarFooter={<VisitorStats />}
         categories={categories}
         contentId="post-list"
         isCategoriesLoading={categoryListQuery.isPending}
