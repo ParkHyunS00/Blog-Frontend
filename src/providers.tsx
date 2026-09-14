@@ -1,9 +1,4 @@
-import {
-  MutationCache,
-  QueryCache,
-  QueryClient,
-  QueryClientProvider,
-} from "@tanstack/react-query";
+import { MutationCache, QueryCache, QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useState } from "react";
 import { ApiException } from "@/core/lib/api-client";
 import { resolveApiErrorAction } from "@/core/lib/api-error-policy";
@@ -23,11 +18,7 @@ function isAuthStatusQueryKey(key: readonly unknown[]): boolean {
 function createQueryClient(): QueryClient {
   const ref: { client: QueryClient | null } = { client: null };
 
-  function handleApiError(
-    error: unknown,
-    failingQueryKey?: readonly unknown[],
-    handlesAuthErrorLocally = false,
-  ): void {
+  function handleApiError(error: unknown, failingQueryKey?: readonly unknown[], handlesAuthErrorLocally = false): void {
     if (!(error instanceof ApiException)) return;
     const isAuthStatusFailure = !!failingQueryKey && isAuthStatusQueryKey(failingQueryKey);
     const action = resolveApiErrorAction(error.status, {
@@ -48,15 +39,14 @@ function createQueryClient(): QueryClient {
 
   const client = new QueryClient({
     queryCache: new QueryCache({
-      onError: (error, query) => handleApiError(error, query.queryKey),
+      onError: (error, query) => {
+        if (query.meta?.handlesErrorLocally === true) return;
+        handleApiError(error, query.queryKey);
+      },
     }),
     mutationCache: new MutationCache({
       onError: (error, _variables, _onMutateResult, mutation) =>
-        handleApiError(
-          error,
-          undefined,
-          mutation.meta?.handlesAuthErrorLocally === true,
-        ),
+        handleApiError(error, undefined, mutation.meta?.handlesAuthErrorLocally === true),
     }),
   });
 
