@@ -6,19 +6,20 @@ import {
   RiStrikethrough,
   RiListUnordered,
   RiListOrdered,
-  RiDoubleQuotesL,
   RiCodeLine,
   RiSeparator,
   RiAlertLine,
 } from "@remixicon/react";
 import { ToolbarButton, ToolbarDivider } from "@/components/post-write/toolbar/toolbar-primitives";
 import { HeadingDropdown } from "@/components/post-write/toolbar/heading-dropdown";
+import { QuoteDropdown } from "@/components/post-write/toolbar/quote-dropdown";
 import { HighlightDropdown } from "@/components/post-write/toolbar/highlight-dropdown";
 import { CodeBlockDropdown } from "@/components/post-write/toolbar/code-block-dropdown";
 import { TableDropdown } from "@/components/post-write/toolbar/table-dropdown";
 import { LinkButton } from "@/components/post-write/toolbar/link-button";
 import { ImageButton } from "@/components/post-write/toolbar/image-button";
 import type { EditorImageUpload } from "@/features/post-write/lib/editor-image-upload";
+import { ChevronRight, LogOut } from "lucide-react";
 
 type Props = {
   editor: Editor;
@@ -36,8 +37,8 @@ export function EditorToolbar({ editor, onUploadImage }: Props): React.ReactElem
       code: e.isActive("code"),
       bulletList: e.isActive("bulletList"),
       orderedList: e.isActive("orderedList"),
-      blockquote: e.isActive("blockquote"),
       callout: e.isActive("callout"),
+      toggle: e.isActive("toggleBlock"),
     }),
   });
 
@@ -78,13 +79,17 @@ export function EditorToolbar({ editor, onUploadImage }: Props): React.ReactElem
 
       <ToolbarDivider />
 
-      <ToolbarButton onClick={() => editor.chain().focus().toggleBlockquote().run()} isActive={activeStates.blockquote} title="인용">
-        <RiDoubleQuotesL size={18} />
-      </ToolbarButton>
+      <QuoteDropdown editor={editor} />
       <ToolbarButton onClick={() => editor.chain().focus().toggleCallout().run()} isActive={activeStates.callout} title="콜아웃">
         <RiAlertLine size={18} />
       </ToolbarButton>
       <CodeBlockDropdown editor={editor} />
+      <ToolbarButton onClick={() => activeStates.toggle ? editor.chain().focus().unsetToggleBlock().run() : editor.chain().focus().insertToggleBlock().run()} isActive={activeStates.toggle} title={activeStates.toggle ? "접기 해제 (내용 유지)" : "접기 블록"}>
+        <ChevronRight size={18} />
+      </ToolbarButton>
+      <ToolbarButton disabled={!activeStates.toggle} onClick={() => editor.chain().focus().exitToggleBlock().run()} title="접기 아래에 쓰기 (Ctrl/⌘+Enter)">
+        <LogOut size={18} />
+      </ToolbarButton>
 
       <ToolbarDivider />
 

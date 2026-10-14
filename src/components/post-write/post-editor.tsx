@@ -1,17 +1,19 @@
 import { useEffect } from "react";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import Underline from "@tiptap/extension-underline";
 import Highlight from "@tiptap/extension-highlight";
 import Link from "@tiptap/extension-link";
 import CodeBlockLowlight from "@tiptap/extension-code-block-lowlight";
-import { Table } from "@tiptap/extension-table";
 import { TableRow } from "@tiptap/extension-table-row";
-import { TableCell } from "@tiptap/extension-table-cell";
-import { TableHeader } from "@tiptap/extension-table-header";
+import { BlogTable, BlogTableCell, BlogTableHeader } from "@/components/post-write/extensions/blog-table";
+import { TableContextToolbar } from "@/components/post-write/toolbar/table-context-toolbar";
 import Placeholder from "@tiptap/extension-placeholder";
 import { common, createLowlight } from "lowlight";
 import { Callout } from "@/components/post-write/extensions/callout";
+import { StyledBlockquote } from "@/components/post-write/extensions/styled-blockquote";
+import { ToggleBlock, ToggleSummary, ToggleContent } from "@/components/post-write/extensions/toggle-block";
 import { ImageWithCaption } from "@/components/post-write/extensions/image-with-caption";
 import { EditorToolbar } from "@/components/post-write/editor-toolbar";
 import { ClearMarksOnEnter } from "@/components/post-write/extensions/clear-marks-on-enter";
@@ -38,11 +40,16 @@ export function PostEditor({ content, onChange, onUploadImage, className }: Prop
     extensions: [
       StarterKit.configure({
         codeBlock: false,
+        blockquote: false,
         heading: { levels: [1, 2, 3, 4, 5, 6] },
         link: false,
         underline: false,
       }),
       Underline,
+      StyledBlockquote,
+      ToggleBlock,
+      ToggleSummary,
+      ToggleContent,
       Highlight.configure({ multicolor: true }),
       Link.configure({
         openOnClick: false,
@@ -50,10 +57,10 @@ export function PostEditor({ content, onChange, onUploadImage, className }: Prop
         HTMLAttributes: { target: "_blank", rel: "noopener noreferrer" },
       }),
       CodeBlockLowlight.configure({ lowlight }),
-      Table.configure({ resizable: false }),
+      BlogTable,
       TableRow,
-      TableCell,
-      TableHeader,
+      BlogTableCell,
+      BlogTableHeader,
       Placeholder.configure({ placeholder: "본문을 작성하세요..." }),
       Callout,
       ImageWithCaption,
@@ -72,6 +79,8 @@ export function PostEditor({ content, onChange, onUploadImage, className }: Prop
 
         // Tab: 리스트에서는 들여쓰기/내어쓰기, 일반 문맥에서는 4칸 공백 삽입
         if (event.key === "Tab") {
+          // Let Tiptap move between cells and create a row at the last cell.
+          if (editor.isActive("table")) return false;
           const isInList = editor.isActive("bulletList") || editor.isActive("orderedList");
 
           event.preventDefault();
@@ -126,13 +135,16 @@ export function PostEditor({ content, onChange, onUploadImage, className }: Prop
   if (!editor) return <div />;
 
   return (
-    <div className={cn("flex flex-col rounded-lg border border-border bg-background transition-colors focus-within:border-ring", className)}>
-      <div className="relative z-10">
+    <div className={cn("flex flex-col rounded-lg border border-border bg-background transition-colors focus-within:border-ring [overflow-anchor:none]", className)}>
+      <div className="relative z-10 shrink-0">
         <EditorToolbar editor={editor} onUploadImage={onUploadImage} />
+        <TableContextToolbar editor={editor} />
       </div>
-      <div className="min-h-0 flex-1 overflow-y-auto rounded-b-lg px-2 py-4 sm:px-4">
-        <EditorContent editor={editor} />
-      </div>
+      <ScrollArea className="min-h-0 flex-1 rounded-b-lg" viewportClassName="absolute inset-0" type="auto">
+        <div className="px-2 py-4 sm:px-4">
+          <EditorContent editor={editor} />
+        </div>
+      </ScrollArea>
     </div>
   );
 }

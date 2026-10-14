@@ -175,6 +175,16 @@
 
 .post-content a {
   @apply text-[#305CEC] underline underline-offset-2 dark:text-[#5B7FFF];
+  overflow-wrap: anywhere;
+}
+
+.post-content a:not(:has(img)) {
+  display: inline-block;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  vertical-align: bottom;
 }
 
 .post-content strong u {
@@ -183,7 +193,16 @@
   background-image: linear-gradient(to top, #fde047 40%, transparent 40%);
 }
 
-.dark .post-content strong u {
+.dark .post-content a:not(:has(img)) {
+  display: inline-block;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  vertical-align: bottom;
+}
+
+.post-content strong u {
   background-image: linear-gradient(to top, rgba(253, 224, 71, 0.3) 40%, transparent 40%);
 }
 
@@ -223,12 +242,110 @@
   opacity: 0.5;
 }
 
-.post-content blockquote {
-  @apply my-8 border-l-4 border-muted-foreground/40 pl-4 text-[#ffa348];
+.post-content blockquote:not([data-quote-style]) {
+  @apply my-6 rounded-r-lg border-l-[3px] border-muted-foreground/40 bg-muted/30 px-5 py-4 text-foreground;
+  line-height: 1.8;
+  overflow-wrap: anywhere;
 }
 
-.post-content blockquote h3 {
-  @apply mt-0 mb-0 text-lg font-semibold text-[#ffa348];
+.post-content blockquote:not([data-quote-style]) > :first-child {
+  margin-top: 0;
+}
+
+.post-content blockquote:not([data-quote-style]) > :last-child {
+  margin-bottom: 0;
+}
+
+.post-content blockquote:not([data-quote-style]) > h3 {
+  @apply text-lg font-semibold text-foreground;
+}
+
+
+/* Shared quote variants: editor, preview and published content. */
+[data-quote-style="note"] {
+  --quote-color: #0969da;
+  --quote-icon: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22black%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Ccircle%20cx%3D%2212%22%20cy%3D%2212%22%20r%3D%229%22%2F%3E%3Cpath%20d%3D%22M12%2011v6M12%207h.01%22%2F%3E%3C%2Fsvg%3E");
+}
+
+.dark [data-quote-style="note"] {
+  --quote-color: #4493f8;
+}
+
+[data-quote-style="tip"] {
+  --quote-color: #1a7f37;
+  --quote-icon: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22black%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M9%2018h6m-5%203h4M8.5%2014.5a6%206%200%201%201%207%200c-1%20.7-1.5%201.5-1.5%203.5h-4c0-2-.5-2.8-1.5-3.5Z%22%2F%3E%3C%2Fsvg%3E");
+}
+
+.dark [data-quote-style="tip"] {
+  --quote-color: #3fb950;
+}
+
+[data-quote-style="important"] {
+  --quote-color: #8250df;
+  --quote-icon: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22black%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M20%203H4a1%201%200%200%200-1%201v14a1%201%200%200%200%201%201h3v3l5-3h8a1%201%200%200%200%201-1V4a1%201%200%200%200-1-1ZM12%207v5m0%203h.01%22%2F%3E%3C%2Fsvg%3E");
+}
+
+.dark [data-quote-style="important"] {
+  --quote-color: #ab7df8;
+}
+
+[data-quote-style="warning"] {
+  --quote-color: #9a6700;
+  --quote-icon: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22black%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22m10.3%203.9-8%2014A2%202%200%200%200%204%2021h16a2%202%200%200%200%201.7-3.1l-8-14a2%202%200%200%200-3.4%200ZM12%209v4m0%204h.01%22%2F%3E%3C%2Fsvg%3E");
+}
+
+.dark [data-quote-style="warning"] {
+  --quote-color: #d29922;
+}
+
+[data-quote-style="caution"] {
+  --quote-color: #d1242f;
+  --quote-icon: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22black%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M8%202h8l6%206v8l-6%206H8l-6-6V8ZM12%207v6m0%204h.01%22%2F%3E%3C%2Fsvg%3E");
+}
+
+.dark [data-quote-style="caution"] {
+  --quote-color: #f85149;
+}
+
+.post-content blockquote[data-quote-style] {
+  @apply my-6 border-l-4 py-1 pl-4 pr-2 text-foreground sm:pl-5;
+  border-color: var(--quote-color);
+}
+
+.post-content blockquote[data-quote-style] .quote-title {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+  color: var(--quote-color);
+  font-weight: 600;
+  line-height: 1.5;
+  user-select: none;
+}
+
+.quote-icon {
+  display: inline-block;
+  flex-shrink: 0;
+  width: 1.25rem;
+  height: 1.25rem;
+  background-color: var(--quote-color);
+  mask: var(--quote-icon) center / contain no-repeat;
+}
+
+.quote-option-label {
+  color: var(--quote-color, inherit);
+}
+
+.post-content blockquote[data-quote-style] > .quote-content > :first-child {
+  margin-top: 0;
+}
+
+.post-content blockquote[data-quote-style] > .quote-content > :last-child {
+  margin-bottom: 0;
+}
+
+.post-content blockquote[data-quote-style] > .quote-content > h3 {
+  color: inherit;
 }
 
 .post-content [data-type="callout"] {
@@ -286,6 +403,23 @@
 .post-content code {
   @apply rounded bg-muted px-1.5 py-0.5 text-sm;
 }
+
+.post-content code:not(pre code) {
+  background-color: #f6f6f6;
+  color: #ff453a;
+}
+
+.dark .post-content code:not(pre code) {
+  background-color: #2c2c2c;
+  color: #4fc3f7;
+}
+
+/* Images can be opened with a pointer or keyboard on published posts. */
+.post-image-viewer-viewport { scrollbar-width: none; }
+.post-image-viewer-viewport::-webkit-scrollbar { display: none; }
+
+.post-content img[data-image-viewer="true"] { cursor: zoom-in; }
+.post-content img[data-image-viewer="true"]:focus-visible { outline: 2px solid var(--ring); outline-offset: 4px; }
 
 /* Code block wrapper */
 .code-block-wrapper {
@@ -516,20 +650,101 @@
   @apply mt-2 text-center text-sm leading-relaxed text-muted-foreground;
 }
 
+/* Tables share the same typography and spacing in editor and detail. */
+.post-content .tableWrapper {
+  @apply my-6 max-w-full overflow-x-auto rounded-xl border border-border;
+  scrollbar-width: thin;
+  overscroll-behavior-x: contain;
+}
+
+.post-content .tableWrapper:focus-visible {
+  @apply outline-2 outline-offset-2 outline-ring;
+}
+
 .post-content table {
-  @apply mx-auto my-6 w-full border-collapse;
-  table-layout: fixed;
+  @apply m-0 w-full border-separate text-sm;
+  border-spacing: 0;
+  table-layout: auto;
 }
 
 .post-content th,
 .post-content td {
-  @apply border border-border px-3 py-1.5 text-center;
-  word-break: break-word;
-  overflow-wrap: break-word;
+  @apply relative border-b border-r border-border px-4 py-3 text-left align-top leading-relaxed;
+  min-width: 8rem;
+  overflow-wrap: anywhere;
 }
 
+.post-content table[data-table-layout="equal"] {
+  table-layout: fixed;
+}
+
+.post-content tr > :last-child { border-right: 0; }
+.post-content tr:last-child > :is(td, th) { border-bottom: 0; }
+
 .post-content th {
-  @apply bg-muted font-semibold;
+  @apply font-semibold text-foreground;
+  background-color: #eef2ff;
+}
+
+.dark .post-content th {
+  background-color: #303236;
+}
+
+.post-content td { @apply bg-background; }
+.post-content td[align="center"],
+.post-content th[align="center"] { text-align: center; }
+.post-content td[align="right"],
+.post-content th[align="right"] { text-align: right; }
+.post-content td[align="left"],
+.post-content th[align="left"] { text-align: left; }
+
+.post-content :is(th, td) > p { @apply my-1; }
+.post-content :is(th, td) > :first-child { margin-top: 0; }
+.post-content :is(th, td) > :last-child { margin-bottom: 0; }
+
+/* Theme and layout are independent, shared by editing and reading views. */
+/* Count body rows only: a header must not shift the stripe pattern. */
+.post-content table[data-table-theme="striped"] > :is(tbody, thead) > tr:nth-child(even of :has(> td)) > td {
+  @apply bg-muted/50;
+}
+
+.post-content .tableWrapper:has(> table[data-table-theme="minimal"]) {
+  border-color: transparent;
+  border-radius: 0;
+}
+
+.post-content table[data-table-theme="minimal"] > :is(tbody, thead) > tr > :is(th, td) {
+  border-right: 0;
+  background-color: transparent;
+}
+
+.post-content table[data-table-theme="minimal"] > :is(tbody, thead) > tr > th {
+  @apply border-b-2 border-border;
+}
+
+/* Real theme styles are reused by the small option previews. */
+.table-theme-preview {
+  pointer-events: none;
+}
+
+.table-theme-preview .tableWrapper {
+  margin: 0;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.table-theme-preview table { table-layout: fixed; }
+.table-theme-preview :is(th, td) {
+  min-width: 0;
+  height: 13px;
+  padding: 4px 3px;
+}
+.table-theme-preview :is(th, td) > span {
+  display: block;
+  height: 2px;
+  border-radius: 2px;
+  background: var(--muted-foreground);
+  opacity: 0.35;
 }
 
 .post-content hr {
@@ -552,6 +767,11 @@
 /* Editor content area */
 .post-editor-content {
   min-height: 100%;
+}
+
+/* Keep the first line in place when an empty paragraph becomes text. */
+.post-editor-content > p:first-child {
+  margin-top: 0;
 }
 
 .post-editor-content:focus {
@@ -605,36 +825,6 @@
   @apply mt-2 text-center text-sm text-muted-foreground;
 }
 
-/* Table within editor */
-.post-editor-content .tableWrapper {
-  @apply my-6 overflow-x-auto;
-}
-
-.post-editor-content table {
-  @apply mx-auto w-full border-collapse;
-  table-layout: fixed;
-}
-
-.post-editor-content th,
-.post-editor-content td {
-  @apply relative border border-border px-3 py-1.5 text-center text-sm;
-  word-break: break-word;
-  overflow-wrap: break-word;
-}
-
-.post-editor-content th {
-  @apply bg-muted font-semibold;
-}
-
-.post-editor-content td {
-  @apply align-top;
-}
-
-.post-editor-content th p,
-.post-editor-content td p {
-  @apply my-0;
-}
-
 /* Selected table cells */
 .post-editor-content .selectedCell {
   @apply bg-[#305CEC]/10 dark:bg-[#5B7FFF]/10;
@@ -643,6 +833,7 @@
 .post-editor-content .selectedCell::after {
   content: "";
   @apply pointer-events-none absolute inset-0 border-2 border-[#305CEC] dark:border-[#5B7FFF];
+  background-color: rgb(48 92 236 / 8%);
 }
 
 /* Column resize handle */
@@ -666,3 +857,65 @@
 .post-editor-content [data-type="callout"] .callout-content p {
   @apply my-0;
 }
+
+/* Native disclosure in published posts; editable disclosure in Tiptap. */
+.post-content details[data-type="toggle"],
+.post-content .toggle-editor {
+  @apply relative my-5;
+}
+
+.post-content details[data-type="toggle"] > summary,
+.post-content .toggle-summary {
+  @apply min-h-12 py-3 pr-4 pl-6 font-semibold text-foreground;
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+}
+
+.post-content details[data-type="toggle"] > summary {
+  position: relative;
+  cursor: pointer;
+  list-style: none;
+}
+.post-content details[data-type="toggle"] > summary::-webkit-details-marker { display: none; }
+.post-content details[data-type="toggle"] > summary::before,
+.post-content .toggle-disclosure::before {
+  content: "";
+  width: 0.75rem;
+  height: 1rem;
+  flex-shrink: 0;
+  background: currentColor;
+  clip-path: polygon(15% 0, 85% 50%, 15% 100%);
+  transition: transform 150ms ease;
+}
+.post-content details[data-type="toggle"] > summary::before {
+  position: absolute;
+  /* Center on the first title line, including when the title wraps. */
+  top: calc(0.75rem + 0.8em - 0.5rem);
+  left: 0;
+  color: var(--muted-foreground);
+}
+.post-content details[data-type="toggle"][open] > summary::before { transform: rotate(90deg); }
+.post-content details[data-type="toggle"] > summary:hover::before { color: var(--foreground); }
+.post-content details[data-type="toggle"] > summary:focus-visible { @apply outline-2 outline-ring; }
+.post-content details[data-type="toggle"] > summary:empty::after { content: "자세히 보기"; }
+
+.post-content .toggle-disclosure {
+  @apply absolute top-3 left-0 flex w-6 items-center text-muted-foreground hover:text-foreground focus-visible:outline-2 focus-visible:outline-ring;
+  height: 1.6em;
+  font-size: inherit;
+  z-index: 1;
+}
+.post-content .toggle-editor[data-expanded="true"] > .toggle-disclosure::before { transform: rotate(90deg); }
+.post-content .toggle-editor[data-expanded="false"] > .toggle-inner > [data-type="toggle-content"] { display: none; }
+.post-content .toggle-summary:has(> br:only-child)::before,
+.post-content .toggle-summary:empty::before {
+  content: attr(data-placeholder);
+  @apply pointer-events-none float-left h-0 font-normal text-muted-foreground;
+}
+
+.post-content details[data-type="toggle"] > [data-type="toggle-content"],
+.post-content .toggle-inner > [data-type="toggle-content"] {
+  @apply pt-1 pr-4 pb-3 pl-6;
+}
+.post-content [data-type="toggle-content"] > :first-child { margin-top: 0; }
+.post-content [data-type="toggle-content"] > :last-child { margin-bottom: 0; }
