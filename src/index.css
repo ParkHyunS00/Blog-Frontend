@@ -1,5 +1,6 @@
 @import "tailwindcss";
 @import "tw-animate-css";
+@import "katex/dist/katex.min.css";
 
 @font-face {
   font-family: "SUIT";
@@ -919,3 +920,81 @@
 }
 .post-content [data-type="toggle-content"] > :first-child { margin-top: 0; }
 .post-content [data-type="toggle-content"] > :last-child { margin-bottom: 0; }
+
+/* Math uses the same spacing and colors in the editor and published article. */
+.post-content [data-type="inline-math"] {
+  display: inline-block;
+  max-width: 100%;
+  vertical-align: middle;
+  /* KaTeX scripts extend beyond the line box; inline math must not be a scroll container. */
+  overflow: visible;
+  padding-inline: 0.15em;
+}
+/* Block math, including matrices and aligned equations, expands with its content. */
+.post-content [data-type="block-math"] {
+  margin-block: 1.25rem;
+  padding: 0.75rem 1rem;
+  overflow: visible;
+  height: auto;
+  max-height: none;
+  color: inherit;
+}
+.post-content [data-type="block-math"] .katex-display { margin: 0; }
+.post-content [data-type="inline-math"],
+.post-content [data-type="block-math"],
+.math-preview {
+  overflow: visible;
+  max-height: none;
+}
+.post-content [data-type="inline-math"] .katex,
+.post-content [data-type="block-math"] .katex,
+.math-preview .katex {
+  overflow: visible;
+  max-height: none;
+}
+.post-editor-content .tiptap-mathematics-render--editable { cursor: pointer; border-radius: 0.25rem; }
+.post-editor-content .tiptap-mathematics-render--editable:hover { background: var(--secondary); }
+.post-editor-content .tiptap-mathematics-render.ProseMirror-selectednode { outline: 2px solid var(--ring); }
+.post-content .math-error { color: var(--destructive); white-space: pre-wrap; }
+
+/* Keep the formula source field consistent across native browser form styles. */
+.math-source-input {
+  display: block;
+  width: 100%;
+  min-height: 72px;
+  max-height: 160px;
+  box-sizing: border-box;
+  appearance: none;
+  -webkit-appearance: none;
+  resize: none;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  padding: 12px 14px;
+  color: var(--foreground);
+  caret-color: var(--primary);
+  font-weight: 400;
+  font-family: var(--font-mono);
+  font-size: 14px;
+  line-height: 1.75;
+  tab-size: 2;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--border) transparent;
+}
+.math-source-input:focus,
+.math-source-input:focus-visible {
+  outline: none;
+  box-shadow: none;
+}
+.math-source-input::placeholder { color: var(--muted-foreground); opacity: 0.65; }
+.math-source-input::selection { background: var(--accent); color: var(--accent-foreground); }
+
+/* Measure formulas at natural width before fitting them to the available space. */
+.post-content [data-type="inline-math"] .katex,
+.post-content [data-type="block-math"] .katex,
+.math-preview .katex {
+  display: inline-block;
+  width: max-content;
+  max-width: none;
+}

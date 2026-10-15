@@ -19,14 +19,15 @@ import { TableDropdown } from "@/components/post-write/toolbar/table-dropdown";
 import { LinkButton } from "@/components/post-write/toolbar/link-button";
 import { ImageButton } from "@/components/post-write/toolbar/image-button";
 import type { EditorImageUpload } from "@/features/post-write/lib/editor-image-upload";
-import { ChevronRight, LogOut } from "lucide-react";
+import { ChevronRight, LogOut, Sigma } from "lucide-react";
 
 type Props = {
   editor: Editor;
+  onInsertMath: () => void;
   onUploadImage: (file: File) => Promise<EditorImageUpload>;
 };
 
-export function EditorToolbar({ editor, onUploadImage }: Props): React.ReactElement {
+export function EditorToolbar({ editor, onUploadImage, onInsertMath }: Props): React.ReactElement {
   const activeStates = useEditorState({
     editor,
     selector: ({ editor: e }) => ({
@@ -48,46 +49,93 @@ export function EditorToolbar({ editor, onUploadImage }: Props): React.ReactElem
 
       <ToolbarDivider />
 
-      <ToolbarButton onClick={() => editor.chain().focus().toggleBold().run()} isActive={activeStates.bold} title="굵게 (Ctrl+B)">
+      <ToolbarButton
+        onClick={() => editor.chain().focus().toggleBold().run()}
+        isActive={activeStates.bold}
+        title="굵게 (Ctrl+B)"
+      >
         <RiBold size={18} />
       </ToolbarButton>
-      <ToolbarButton onClick={() => editor.chain().focus().toggleItalic().run()} isActive={activeStates.italic} title="기울임 (Ctrl+I)">
+      <ToolbarButton
+        onClick={() => editor.chain().focus().toggleItalic().run()}
+        isActive={activeStates.italic}
+        title="기울임 (Ctrl+I)"
+      >
         <RiItalic size={18} />
       </ToolbarButton>
-      <ToolbarButton onClick={() => editor.chain().focus().toggleUnderline().run()} isActive={activeStates.underline} title="밑줄 (Ctrl+U)">
+      <ToolbarButton
+        onClick={() => editor.chain().focus().toggleUnderline().run()}
+        isActive={activeStates.underline}
+        title="밑줄 (Ctrl+U)"
+      >
         <RiUnderline size={18} />
       </ToolbarButton>
-      <ToolbarButton onClick={() => editor.chain().focus().toggleStrike().run()} isActive={activeStates.strike} title="취소선">
+      <ToolbarButton
+        onClick={() => editor.chain().focus().toggleStrike().run()}
+        isActive={activeStates.strike}
+        title="취소선"
+      >
         <RiStrikethrough size={18} />
       </ToolbarButton>
 
       <ToolbarDivider />
 
       <HighlightDropdown editor={editor} />
-      <ToolbarButton onClick={() => editor.chain().focus().toggleCode().run()} isActive={activeStates.code} title="인라인 코드">
+      <ToolbarButton
+        onClick={() => editor.chain().focus().toggleCode().run()}
+        isActive={activeStates.code}
+        title="인라인 코드"
+      >
         <RiCodeLine size={18} />
       </ToolbarButton>
 
       <ToolbarDivider />
 
-      <ToolbarButton onClick={() => editor.chain().focus().toggleBulletList().run()} isActive={activeStates.bulletList} title="순서 없는 목록">
+      <ToolbarButton
+        onClick={() => editor.chain().focus().toggleBulletList().run()}
+        isActive={activeStates.bulletList}
+        title="순서 없는 목록"
+      >
         <RiListUnordered size={18} />
       </ToolbarButton>
-      <ToolbarButton onClick={() => editor.chain().focus().toggleOrderedList().run()} isActive={activeStates.orderedList} title="순서 있는 목록">
+      <ToolbarButton
+        onClick={() => editor.chain().focus().toggleOrderedList().run()}
+        isActive={activeStates.orderedList}
+        title="순서 있는 목록"
+      >
         <RiListOrdered size={18} />
       </ToolbarButton>
 
       <ToolbarDivider />
 
       <QuoteDropdown editor={editor} />
-      <ToolbarButton onClick={() => editor.chain().focus().toggleCallout().run()} isActive={activeStates.callout} title="콜아웃">
+      <ToolbarButton
+        onClick={() => editor.chain().focus().toggleCallout().run()}
+        isActive={activeStates.callout}
+        title="콜아웃"
+      >
         <RiAlertLine size={18} />
       </ToolbarButton>
       <CodeBlockDropdown editor={editor} />
-      <ToolbarButton onClick={() => activeStates.toggle ? editor.chain().focus().unsetToggleBlock().run() : editor.chain().focus().insertToggleBlock().run()} isActive={activeStates.toggle} title={activeStates.toggle ? "접기 해제 (내용 유지)" : "접기 블록"}>
+      <ToolbarButton onClick={onInsertMath} title="수식 삽입 / 수정">
+        <Sigma size={18} />
+      </ToolbarButton>
+      <ToolbarButton
+        onClick={() =>
+          activeStates.toggle
+            ? editor.chain().focus().unsetToggleBlock().run()
+            : editor.chain().focus().insertToggleBlock().run()
+        }
+        isActive={activeStates.toggle}
+        title={activeStates.toggle ? "접기 해제 (내용 유지)" : "접기 블록"}
+      >
         <ChevronRight size={18} />
       </ToolbarButton>
-      <ToolbarButton disabled={!activeStates.toggle} onClick={() => editor.chain().focus().exitToggleBlock().run()} title="접기 아래에 쓰기 (Ctrl/⌘+Enter)">
+      <ToolbarButton
+        disabled={!activeStates.toggle}
+        onClick={() => editor.chain().focus().exitToggleBlock().run()}
+        title="접기 아래에 쓰기 (Ctrl/⌘+Enter)"
+      >
         <LogOut size={18} />
       </ToolbarButton>
 
