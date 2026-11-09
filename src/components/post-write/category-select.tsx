@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { RiArrowDownSLine, RiAddLine, RiCheckLine } from "@remixicon/react";
 import { cn } from "@/lib/utils";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 type Props = {
   value: string;
@@ -12,6 +13,21 @@ export function CategorySelect({ value, onChange, categories }: Props): React.Re
   const [isOpen, setIsOpen] = useState(false);
   const [isCreating, setIsCreating] = useState(false);
   const [newCategory, setNewCategory] = useState("");
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!isOpen) return;
+
+    function handleOutsidePointerDown(event: PointerEvent): void {
+      if (!(event.target instanceof Node) || containerRef.current?.contains(event.target)) return;
+      setIsOpen(false);
+      setIsCreating(false);
+      setNewCategory("");
+    }
+
+    document.addEventListener("pointerdown", handleOutsidePointerDown, true);
+    return () => document.removeEventListener("pointerdown", handleOutsidePointerDown, true);
+  }, [isOpen]);
 
   function handleSelect(category: string): void {
     onChange(category);
@@ -47,10 +63,11 @@ export function CategorySelect({ value, onChange, categories }: Props): React.Re
   }
 
   return (
-    <div className="relative">
+    <div ref={containerRef} className="relative">
       <button
         type="button"
         onClick={handleToggle}
+        aria-expanded={isOpen}
         className={cn(
           "flex h-10 w-full items-center justify-between rounded-lg border border-border bg-background px-4 text-sm transition-colors hover:border-ring",
           value ? "text-foreground" : "text-muted-foreground"
@@ -65,7 +82,8 @@ export function CategorySelect({ value, onChange, categories }: Props): React.Re
 
       {isOpen && (
         <div className="absolute top-full z-20 mt-1 w-full overflow-hidden rounded-lg border border-border bg-background shadow-lg">
-          <div className="max-h-48 overflow-y-auto py-1">
+          <ScrollArea viewportClassName="max-h-48" type="auto">
+            <div className="py-1">
             {categories.map((cat) => (
               <button
                 key={cat}
@@ -80,7 +98,8 @@ export function CategorySelect({ value, onChange, categories }: Props): React.Re
                 <span className={cn(value !== cat && "pl-6")}>{cat}</span>
               </button>
             ))}
-          </div>
+            </div>
+          </ScrollArea>
 
           <div className="border-t border-border p-2">
             {isCreating ? (

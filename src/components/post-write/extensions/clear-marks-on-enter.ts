@@ -6,6 +6,10 @@ export const ClearMarksOnEnter = Extension.create({
   addKeyboardShortcuts() {
     return {
       Enter: ({ editor }) => {
+        if (editor.isActive("callout")) {
+          return editor.commands.exitCallout();
+        }
+
         // 코드블록, 리스트 내부에서는 기본 동작 유지
         if (
           editor.isActive("codeBlock") ||

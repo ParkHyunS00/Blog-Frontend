@@ -42,7 +42,7 @@ export function prepareTocContent(html: string): PreparedTocContent {
 
   return {
     html: doc.body.innerHTML,
-    items: headings.map((heading) => ({
+    items: headings.filter((heading) => !heading.closest("details")).map((heading) => ({
       id: heading.id,
       text: heading.textContent ?? "",
       level: Number(heading.tagName[1]),

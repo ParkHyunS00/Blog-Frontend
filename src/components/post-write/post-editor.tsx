@@ -1,27 +1,30 @@
-import { useEffect } from "react";
+import { useFitMath } from "@/features/post/hooks/use-fit-math";
+import { InlineMath, BlockMath } from "@tiptap/extension-mathematics";
+import { mathOptions } from "@/features/post/lib/post-math";
+import { MathDialog, type MathDraft } from "./toolbar/math-dialog";
+import { useEffect, useState } from "react";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import Underline from "@tiptap/extension-underline";
 import Highlight from "@tiptap/extension-highlight";
 import Link from "@tiptap/extension-link";
 import CodeBlockLowlight from "@tiptap/extension-code-block-lowlight";
-import { Table } from "@tiptap/extension-table";
 import { TableRow } from "@tiptap/extension-table-row";
-import { TableCell } from "@tiptap/extension-table-cell";
-import { TableHeader } from "@tiptap/extension-table-header";
+import { BlogTable, BlogTableCell, BlogTableHeader } from "@/components/post-write/extensions/blog-table";
+import { TableContextToolbar } from "@/components/post-write/toolbar/table-context-toolbar";
 import Placeholder from "@tiptap/extension-placeholder";
 import { common, createLowlight } from "lowlight";
 import { Callout } from "@/components/post-write/extensions/callout";
+import { StyledBlockquote } from "@/components/post-write/extensions/styled-blockquote";
+import { ToggleBlock, ToggleSummary, ToggleContent } from "@/components/post-write/extensions/toggle-block";
 import { ImageWithCaption } from "@/components/post-write/extensions/image-with-caption";
 import { EditorToolbar } from "@/components/post-write/editor-toolbar";
 import { ClearMarksOnEnter } from "@/components/post-write/extensions/clear-marks-on-enter";
 import { getEditorIndentationText } from "@/components/post-write/editor-indentation";
 import { cn } from "@/lib/utils";
 import { API_BASE_URL } from "@/core/lib/api-client";
-import {
-  toPostImageDisplayHtml,
-  toPostImageStorageHtml,
-} from "@/features/post/lib/post-image-url";
+import { toPostImageDisplayHtml, toPostImageStorageHtml } from "@/features/post/lib/post-image-url";
 import type { EditorImageUpload } from "@/features/post-write/lib/editor-image-upload";
 
 const lowlight = createLowlight(common);
@@ -34,15 +37,32 @@ type Props = {
 };
 
 export function PostEditor({ content, onChange, onUploadImage, className }: Props): React.ReactElement {
+  const mathRoot = useFitMath();
+  const [mathDraft, setMathDraft] = useState<MathDraft | null>(null);
   const editor = useEditor({
     extensions: [
       StarterKit.configure({
         codeBlock: false,
+        blockquote: false,
         heading: { levels: [1, 2, 3, 4, 5, 6] },
         link: false,
         underline: false,
       }),
+      InlineMath.configure({
+        katexOptions: { ...mathOptions, displayMode: false },
+        onClick: (node, pos) =>
+          setMathDraft({ from: pos, to: pos + node.nodeSize, latex: node.attrs.latex, block: false, editing: true }),
+      }),
+      BlockMath.configure({
+        katexOptions: { ...mathOptions, displayMode: true },
+        onClick: (node, pos) =>
+          setMathDraft({ from: pos, to: pos + node.nodeSize, latex: node.attrs.latex, block: true, editing: true }),
+      }),
       Underline,
+      StyledBlockquote,
+      ToggleBlock,
+      ToggleSummary,
+      ToggleContent,
       Highlight.configure({ multicolor: true }),
       Link.configure({
         openOnClick: false,
@@ -50,10 +70,10 @@ export function PostEditor({ content, onChange, onUploadImage, className }: Prop
         HTMLAttributes: { target: "_blank", rel: "noopener noreferrer" },
       }),
       CodeBlockLowlight.configure({ lowlight }),
-      Table.configure({ resizable: false }),
+      BlogTable,
       TableRow,
-      TableCell,
-      TableHeader,
+      BlogTableCell,
+      BlogTableHeader,
       Placeholder.configure({ placeholder: "본문을 작성하세요..." }),
       Callout,
       ImageWithCaption,
@@ -72,6 +92,8 @@ export function PostEditor({ content, onChange, onUploadImage, className }: Prop
 
         // Tab: 리스트에서는 들여쓰기/내어쓰기, 일반 문맥에서는 4칸 공백 삽입
         if (event.key === "Tab") {
+          // Let Tiptap move between cells and create a row at the last cell.
+          if (editor.isActive("table")) return false;
           const isInList = editor.isActive("bulletList") || editor.isActive("orderedList");
 
           event.preventDefault();
@@ -126,13 +148,38 @@ export function PostEditor({ content, onChange, onUploadImage, className }: Prop
   if (!editor) return <div />;
 
   return (
-    <div className={cn("flex flex-col rounded-lg border border-border bg-background transition-colors focus-within:border-ring", className)}>
-      <div className="relative z-10">
-        <EditorToolbar editor={editor} onUploadImage={onUploadImage} />
+    <div
+      ref={mathRoot}
+      className={cn(
+        "flex flex-col rounded-lg border border-border bg-background transition-colors focus-within:border-ring [overflow-anchor:none]",
+        className,
+      )}
+    >
+      <div className="relative z-10 shrink-0">
+        <EditorToolbar
+          editor={editor}
+          onUploadImage={onUploadImage}
+          onInsertMath={() => {
+            const { from, to } = editor.state.selection;
+            const node = editor.state.doc.nodeAt(from);
+            const editing = node?.type.name === "inlineMath" || node?.type.name === "blockMath";
+            setMathDraft({
+              from,
+              to: editing ? from + node.nodeSize : to,
+              latex: editing ? node.attrs.latex : "",
+              block: editing && node.type.name === "blockMath",
+              editing,
+            });
+          }}
+        />
+        <TableContextToolbar editor={editor} />
       </div>
-      <div className="min-h-0 flex-1 overflow-y-auto rounded-b-lg px-2 py-4 sm:px-4">
-        <EditorContent editor={editor} />
-      </div>
+      {mathDraft && <MathDialog editor={editor} draft={mathDraft} onClose={() => setMathDraft(null)} />}
+      <ScrollArea className="min-h-0 flex-1 rounded-b-lg" viewportClassName="absolute inset-0" type="auto">
+        <div className="px-2 py-4 sm:px-4">
+          <EditorContent editor={editor} />
+        </div>
+      </ScrollArea>
     </div>
   );
 }

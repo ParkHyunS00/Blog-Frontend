@@ -3,6 +3,7 @@ import { CategoryListSkeleton } from "@/components/category/category-list-skelet
 import type { Category } from "@/features/category/types/category.types";
 
 type CategorySidebarProps = {
+  footer?: React.ReactNode;
   categories: Category[];
   isLoading: boolean;
   isError: boolean;
@@ -10,6 +11,7 @@ type CategorySidebarProps = {
 };
 
 export function CategorySidebar({
+  footer,
   categories,
   isLoading,
   isError,
@@ -28,6 +30,7 @@ export function CategorySidebar({
           </div>
         ) : null}
         {!isLoading && !isError ? <CategoryList categories={categories} /> : null}
+        {footer}
       </div>
     </aside>
   );

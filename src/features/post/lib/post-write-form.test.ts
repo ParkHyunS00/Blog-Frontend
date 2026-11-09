@@ -28,3 +28,16 @@ test("본문에 텍스트 또는 이미지만 있어도 작성 중인 글로 판
   assert.equal(hasPostWriteContent({ ...emptyForm, content: "<p>본문</p>" }), true);
   assert.equal(hasPostWriteContent({ ...emptyForm, content: '<p><img src="image.png"></p>' }), true);
 });
+
+test("수식만 입력해도 작성 중인 내용으로 인식한다", () => {
+  for (const content of [
+    '<p><span data-type="inline-math" data-latex="x^2"></span></p>',
+    '<div data-type="block-math" data-latex="x"></div>',
+  ]) {
+    assert.equal(hasPostWriteContent({ ...emptyForm, content }), true);
+  }
+  assert.equal(
+    hasPostWriteContent({ ...emptyForm, content: '<span data-type="inline-math" data-latex=" "></span>' }),
+    false,
+  );
+});

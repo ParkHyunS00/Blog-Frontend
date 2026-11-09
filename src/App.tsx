@@ -5,6 +5,7 @@ import { Footer } from "@/components/shared/footer";
 import { ErrorPage } from "@/components/shared/error-page";
 import { useApiErrorStore } from "@/core/stores/use-api-error-store";
 import { HomePage } from "@/routes/index";
+import { useVisitorStats } from "@/features/visitor/hooks/use-visitor-stats";
 
 const PostsPage = lazy(() =>
   import("@/routes/posts/index").then((module) => ({
@@ -56,6 +57,7 @@ function ApiErrorBridge(): null {
 }
 
 function App() {
+  useVisitorStats();
   const errorKind = useApiErrorStore((state) => state.errorKind);
 
   return (

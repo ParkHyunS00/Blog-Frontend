@@ -49,3 +49,15 @@ test("이미지가 없는 본문은 내용을 변경하지 않는다", () => {
 
   assert.equal(optimizePostContentImages(html), html);
 });
+
+test("본문 이미지는 키보드로 확대할 수 있고 링크 이미지의 동작은 유지한다", () => {
+  const [plain, linked] = parseImages(optimizePostContentImages(
+    '<img src="/one.png" alt="설명"><a href="/destination"><img src="/two.png" alt="링크"></a>',
+  ));
+  assert.equal(plain.getAttribute("role"), "button");
+  assert.equal(plain.getAttribute("tabindex"), "0");
+  assert.equal(plain.getAttribute("aria-label"), "설명 크게 보기");
+  assert.equal(plain.getAttribute("data-image-viewer"), "true");
+  assert.equal(linked.hasAttribute("data-image-viewer"), false);
+  assert.equal(linked.hasAttribute("role"), false);
+});

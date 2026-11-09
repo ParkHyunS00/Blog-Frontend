@@ -1,3 +1,4 @@
+import { hasMathContent } from "../../post/lib/has-math-content.ts";
 import type { PostWriteForm } from "../../post/types/post-write.types.ts";
 import type { PublishPostPayload, SaveDraftPayload } from "../types/post-write-api.types.ts";
 import { extractContentImageIds } from "./post-image-ids.ts";
@@ -13,7 +14,14 @@ function nullable(value: string): string | null {
 }
 
 function hasBodyTextOrImage(html: string): boolean {
-  return extractContentImageIds(html).length > 0 || html.replace(/<[^>]*>/g, "").replace(/&nbsp;/gi, " ").trim().length > 0;
+  return (
+    hasMathContent(html) ||
+    extractContentImageIds(html).length > 0 ||
+    html
+      .replace(/<[^>]*>/g, "")
+      .replace(/&nbsp;/gi, " ")
+      .trim().length > 0
+  );
 }
 
 export function toSaveDraftPayload(form: PostWriteForm): SaveDraftPayload {

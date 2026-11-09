@@ -47,3 +47,27 @@ test("제목 문자가 없는 heading에도 충돌하지 않는 fallback ID를 �
     { id: "section-2", text: "!!!", level: 3 },
   ]);
 });
+
+test("접기 내부 헤딩은 펼침 여부와 중첩 깊이에 관계없이 목차에서 제외한다", () => {
+  for (const expanded of ["", " open"]) {
+    const result = prepareTocContent(
+      `<h2>본문 시작</h2><details data-type="toggle"${expanded}><summary>보충 설명</summary><div data-type="toggle-content"><h2>접기 제목</h2><details data-type="toggle" open><summary>중첩 설명</summary><div data-type="toggle-content"><h3>중첩 제목</h3></div></details></div></details><h3>본문 끝</h3>`,
+    );
+
+    assert.deepEqual(result.items, [
+      { id: "본문-시작", text: "본문 시작", level: 2 },
+      { id: "본문-끝", text: "본문 끝", level: 3 },
+    ]);
+    const doc = new LinkedomDOMParser().parseFromString(result.html, "text/html");
+    assert.equal(doc.querySelector("details h2")?.textContent, "접기 제목");
+    assert.equal(doc.querySelector("details details h3")?.textContent, "중첩 제목");
+  }
+});
+
+test("접기 안에만 헤딩이 있으면 목차가 비어 있고 기존 ID는 보존한다", () => {
+  const result = prepareTocContent(
+    '<details data-type="toggle"><summary>설명</summary><div data-type="toggle-content"><h2 id="existing">보충 내용</h2></div></details>',
+  );
+  assert.deepEqual(result.items, []);
+  assert.match(result.html, /<h2 id="existing">보충 내용<\/h2>/);
+});

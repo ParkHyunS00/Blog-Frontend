@@ -121,7 +121,7 @@ export function PostDetailPage(): React.ReactElement {
       }
     >
       <PostDetailSummary summary={post.summary} />
-      <PostDetailContent content={preparedContent.html} />
+      <PostDetailContent key={postId} content={preparedContent.html} postTitle={post.title} />
       <PostDetailTags tags={post.tags} />
       <PostDetailComments />
     </PostDetailLayout>
