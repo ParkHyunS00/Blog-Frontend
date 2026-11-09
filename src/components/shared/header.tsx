@@ -20,10 +20,7 @@ import {
 import { useThemeStore } from "@/core/stores/use-theme-store";
 import { useAuthStatus } from "@/features/admin-auth/hooks/queries/use-auth-status";
 import { useLogoutMutation } from "@/features/admin-auth/hooks/mutations/use-logout-mutation";
-import {
-  getSearchKeyword,
-  searchParamsForKeyword,
-} from "@/features/post/lib/post-list-search-params";
+import { getSearchKeyword, searchParamsForKeyword } from "@/features/post/lib/post-list-search-params";
 
 const NAV_ITEMS = [
   { label: "ABOUT", path: "/about" },
@@ -110,7 +107,7 @@ export function Header(): React.ReactElement {
     <header className="sticky top-0 z-50 w-full border-b border-border bg-background ">
       <div className="mx-auto flex h-14 max-w-screen-xl items-center justify-between px-4">
         <Link to="/" className="flex-shrink-0">
-          <img src="/logo.svg" alt="ParkHyunSOO" className="h-7 dark:invert" />
+          <img src="/logo.svg" alt="ParkHyunSOO" width={941} height={124} className="block h-5 w-auto dark:invert" />
         </Link>
 
         {/* Desktop Navigation */}
@@ -145,22 +142,13 @@ export function Header(): React.ReactElement {
           </form>
 
           {/* Dark Mode Toggle */}
-          <button
-            type="button"
-            onClick={toggleTheme}
-            className={ICON_BUTTON_CLASS}
-            aria-label={themeAriaLabel}
-          >
+          <button type="button" onClick={toggleTheme} className={ICON_BUTTON_CLASS} aria-label={themeAriaLabel}>
             <ThemeIcon size={20} />
           </button>
 
           <DropdownMenu modal={false}>
             <DropdownMenuTrigger asChild>
-              <button
-                type="button"
-                className={ICON_BUTTON_CLASS}
-                aria-label="계정 메뉴"
-              >
+              <button type="button" className={ICON_BUTTON_CLASS} aria-label="계정 메뉴">
                 <RiKey2Line size={20} />
               </button>
             </DropdownMenuTrigger>
@@ -196,17 +184,12 @@ export function Header(): React.ReactElement {
       <div
         className={cn(
           "overflow-hidden border-t border-border bg-background transition-all duration-300 md:hidden ",
-          isMobileMenuOpen ? "max-h-96" : "max-h-0 border-t-0"
+          isMobileMenuOpen ? "max-h-96" : "max-h-0 border-t-0",
         )}
       >
         <div className="space-y-4 px-4 py-4">
           {/* Mobile Search */}
-          <form
-            key={`mobile-${location.search}`}
-            className="relative"
-            role="search"
-            onSubmit={handleSearchSubmit}
-          >
+          <form key={`mobile-${location.search}`} className="relative" role="search" onSubmit={handleSearchSubmit}>
             <button type="submit" className={SEARCH_BUTTON_CLASS} aria-label="게시글 검색">
               <RiSearchLine size={18} />
             </button>
@@ -223,12 +206,7 @@ export function Header(): React.ReactElement {
           {/* Mobile Navigation */}
           <nav className="flex flex-col gap-2">
             {NAV_ITEMS.map((item) => (
-              <Link
-                key={item.path}
-                to={item.path}
-                onClick={handleMobileMenuClose}
-                className={MOBILE_NAV_LINK_CLASS}
-              >
+              <Link key={item.path} to={item.path} onClick={handleMobileMenuClose} className={MOBILE_NAV_LINK_CLASS}>
                 {item.label}
               </Link>
             ))}
