@@ -8,57 +8,124 @@ on:
       - main
   workflow_dispatch:
 
+permissions:
+  contents: read
+
 concurrency:
   group: frontend-deploy-${{ github.ref }}
-  cancel-in-progress: true
+  cancel-in-progress: false
+
+defaults:
+  run:
+    shell: bash
 
 jobs:
-  build-and-push:
-    if: github.event.pull_request.merged == true && (github.base_ref == 'main')
+  build:
+    name: Build Frontend
+    if: >-
+      (github.event_name == 'pull_request' && github.event.pull_request.merged == true && github.base_ref == 'main') ||
+      (github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main')
     runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      RELEASE_ID: ${{ github.sha }}-${{ github.run_id }}-${{ github.run_attempt }}
+    outputs:
+      release_id: ${{ steps.build.outputs.release_id }}
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          persist-credentials: false
 
-      - name: Build
+      - name: Build and package frontend
+        id: build
         run: |
+          set -euo pipefail
           docker build -t frontend-builder .
+          container_id=$(docker create frontend-builder)
+          trap 'docker rm -f "$container_id" >/dev/null' EXIT
+          docker cp "$container_id:/app/dist" ./dist
 
-          CID=$(docker create frontend-builder)
-
-          docker cp $CID:/app/dist ./dist
-          docker rm $CID
+          test -s dist/index.html
+          test -d dist/assets
+          mkdir release
+          tar -C dist -czf release/dist.tar.gz .
+          (
+            cd release
+            sha256sum dist.tar.gz > dist.tar.gz.sha256
+          )
+          printf 'release_id=%s\n' "$RELEASE_ID" >> "$GITHUB_OUTPUT"
 
       - name: Upload frontend artifact
         uses: actions/upload-artifact@v4
         with:
-          name: frontend-dist
-          path: dist
+          name: frontend-release-${{ steps.build.outputs.release_id }}
+          path: release
+          if-no-files-found: error
+          compression-level: 0
 
   deploy:
-    name: Deploy Frontend
-    if: github.event.pull_request.merged == true
-    needs: build-and-push
+    name: Publish Frontend Release
+    needs: build
     runs-on: self-hosted
+    timeout-minutes: 15
+    outputs:
+      mode: ${{ steps.publish.outputs.mode }}
+    env:
+      RELEASE_ID: ${{ needs.build.outputs.release_id }}
+      GARAGE_ENDPOINT: ${{ vars.GARAGE_ENDPOINT }}
+      GARAGE_BUCKET: ${{ vars.GARAGE_BUCKET }}
+      BLOG_DEPLOY_HOST: ${{ vars.BLOG_DEPLOY_HOST }}
+      # Keep prepare until nginx serves the new release directory.
+      BLOG_DEPLOY_MODE: ${{ vars.BLOG_DEPLOY_MODE || 'prepare' }}
 
     steps:
       - name: Download artifact
+        id: artifact
         uses: actions/download-artifact@v4
         with:
-          name: frontend-dist
-          path: dist
+          name: frontend-release-${{ needs.build.outputs.release_id }}
+          path: ${{ runner.temp }}/frontend-release-${{ github.run_id }}-${{ github.run_attempt }}
 
-      - name: Deploy to nginx
+      - name: Upload and deploy release
+        id: publish
+        working-directory: ${{ steps.artifact.outputs.download-path }}
         run: |
-          rm -rf /mnt/deploy/blog-web-html/*
-          cp -r dist/* /mnt/deploy/blog-web-html/
+          set -euo pipefail
+          : "${GARAGE_ENDPOINT:?Set the GARAGE_ENDPOINT repository variable}"
+          : "${GARAGE_BUCKET:?Set the GARAGE_BUCKET repository variable}"
+          : "${BLOG_DEPLOY_HOST:?Set the BLOG_DEPLOY_HOST repository variable}"
+          case "$BLOG_DEPLOY_MODE" in
+            prepare|deploy) ;;
+            *) echo 'BLOG_DEPLOY_MODE must be prepare or deploy' >&2; exit 1 ;;
+          esac
+          sha256sum --check --strict dist.tar.gz.sha256
+
+          # The runner's garage-runner profile supplies credentials, region and path-style S3.
+          for release_file in dist.tar.gz dist.tar.gz.sha256; do
+            aws --profile garage-runner --endpoint-url "$GARAGE_ENDPOINT" \
+              s3 cp "$release_file" \
+              "s3://$GARAGE_BUCKET/releases/$RELEASE_ID/$release_file" \
+              --only-show-errors
+          done
+
+          printf -v remote_command '/opt/blog-web/deploy.sh %q %q' "$BLOG_DEPLOY_MODE" "$RELEASE_ID"
+          ssh \
+            -i /root/.ssh/blog-front-deploy \
+            -o IdentitiesOnly=yes \
+            -o BatchMode=yes \
+            -o StrictHostKeyChecking=yes \
+            -o ConnectTimeout=10 \
+            "blog-deploy@$BLOG_DEPLOY_HOST" "$remote_command"
+          printf 'mode=%s\n' "$BLOG_DEPLOY_MODE" >> "$GITHUB_OUTPUT"
+          printf 'Release: %s\n\nMode: %s\n' "$RELEASE_ID" "$BLOG_DEPLOY_MODE" >> "$GITHUB_STEP_SUMMARY"
 
   notify:
     name: Notify Discord
     if: ${{ always() }}
     needs:
-      - build-and-push
+      - build
       - deploy
     runs-on: ubuntu-latest
 
@@ -68,14 +135,15 @@ jobs:
         uses: tsickert/discord-webhook@v7.0.0
         with:
           webhook-url: ${{ secrets.DISCORD_DEPLOY_NOTI_WEBHOOK }}
-          embed-title: "🚀 Blog Frontend 배포 성공 🚀"
+          embed-title: ${{ needs.deploy.outputs.mode == 'deploy' && '🚀 Blog Frontend 배포 성공' || '📦 Blog Frontend 배포 준비 완료' }}
           embed-description: |
-            main PR 병합이 성공적으로 배포되었습니다.
+            ${{ needs.deploy.outputs.mode == 'deploy' && '프론트엔드 배포와 HTTP 응답 확인이 완료되었습니다.' || '파일 준비, 검증 완료. 서비스 버전은 전환하지 않았습니다.' }}
             > **Commit**: `${{ github.sha }}`
+            > **Release**: `${{ needs.build.outputs.release_id }}`
           embed-color: 3066993
 
       - name: Notify failure
-        if: needs.build-and-push.result == 'failure' || needs.deploy.result == 'failure'
+        if: needs.build.result == 'failure' || needs.deploy.result == 'failure'
         uses: tsickert/discord-webhook@v7.0.0
         with:
           webhook-url: ${{ secrets.DISCORD_DEPLOY_NOTI_WEBHOOK }}
@@ -84,7 +152,7 @@ jobs:
             블로그 프론트엔드 배포 중 오류가 발생했습니다.
 
             > **실패 단계**
-            > - build-and-push: `${{ needs.build-and-push.result }}`
+            > - build: `${{ needs.build.result }}`
             > - deploy: `${{ needs.deploy.result }}`
 
             🔍 **실행 로그 확인**
