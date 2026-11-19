@@ -2,8 +2,7 @@ import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import test from "node:test";
 
-const DEFAULT_DESCRIPTION =
-  "웹 개발자 박현수의 기술 블로그입니다. 개발하며 배우고 고민한 내용을 기록하고 공유합니다.";
+const DEFAULT_DESCRIPTION = "현수의 성장 아카이브";
 
 test("초기 문서에 메인 페이지 기본 설명을 제공한다", async () => {
   const html = await readFile(new URL("../../../index.html", import.meta.url), "utf8");
